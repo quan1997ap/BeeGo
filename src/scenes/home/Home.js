@@ -1,28 +1,35 @@
-import React, { Component } from 'react';
-import logo from './../../assets/logo.svg';
-import './Home.css';
+import React, { Component } from "react";
+import "./Home.css";
+import HeaderComponent from "../../components/HeaderComponent.js/HeaderComponent";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Switch,
+  Redirect
+} from "react-router-dom";
 
-class Home extends Component {
+import ProfileComponent from "../../components/ProfileComponent/ProfileComponent";
+import LoginComponent from "../../components/LoginComponent/LoginComponent";
+import SignUpComponent from "../../components/SignUpComponent/SignUpComponent";
+import NoMatchComponent from "../../components/NoMatchComponent/NoMatchComponent";
+
+class HomePage extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div className="App-container">
+        <Router>
+          <HeaderComponent />
+          <Switch>
+            <Route path="/signup" component={SignUpComponent} />
+            <Route path="/profile" component={ProfileComponent} />
+            <Route path="/login" component={LoginComponent} />
+            <Route component={NoMatchComponent} />
+          </Switch>
+        </Router>
       </div>
     );
   }
 }
 
-export default Home;
+export default HomePage;
