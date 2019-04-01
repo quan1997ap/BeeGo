@@ -1,10 +1,9 @@
 import React, { Component } from "react";
-import "./Home.css";
+import "./AppContainer.css";
 import HeaderComponent from "../../components/HeaderComponent.js/HeaderComponent";
 import {
   BrowserRouter as Router,
   Route,
-  Link,
   Switch,
   Redirect
 } from "react-router-dom";
@@ -13,23 +12,25 @@ import ProfileComponent from "../../components/ProfileComponent/ProfileComponent
 import LoginComponent from "../../components/LoginComponent/LoginComponent";
 import SignUpComponent from "../../components/SignUpComponent/SignUpComponent";
 import NoMatchComponent from "../../components/NoMatchComponent/NoMatchComponent";
+import HomeComponent from "../../components/HomeComponent.js/HomeComponent";
 
-class HomePage extends Component {
+class AppContainer extends Component {
   render() {
     return (
-      <div className="App-container">
-        <Router>
+      <Router>
+        <div className="App-container">
           <HeaderComponent />
           <Switch>
+            <Route path="/" exact component={HomeComponent} />
             <Route path="/signup" component={SignUpComponent} />
             <Route path="/profile" component={ProfileComponent} />
             <Route path="/login" component={LoginComponent} />
             <Route component={NoMatchComponent} />
           </Switch>
-        </Router>
-      </div>
+        </div>
+      </Router>
     );
   }
 }
 
-export default HomePage;
+export default AppContainer;

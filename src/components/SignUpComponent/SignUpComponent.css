@@ -1,6 +1,18 @@
 .SignIn-component {
   text-align: center;
 }
+.Display-none{
+  display: none;
+}
+.Opacity-disable{
+  opacity:0.5 !important;
+}
+.Display-block{
+  display: block;
+}
+.Input-invalid{
+  color: red;
+}
 .Active-bg{
   background: linear-gradient(45deg, #00dbde, #fc00ff) !important; 
 }
@@ -34,6 +46,10 @@
   background-color: #f1f1f1;
   color: black;
   border-color: #0062cc;
+}
+.btn-type-user-form-valid{
+  background: linear-gradient(45deg, #00dbde, #fc00ff) !important;
+  color: #333;
 }
 
 .btn-type-user:hover{

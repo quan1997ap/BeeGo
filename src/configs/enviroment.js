@@ -1,0 +1,1 @@
+export const rootPath= "http://negoo.tk";

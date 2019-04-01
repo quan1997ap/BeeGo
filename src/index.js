@@ -2,12 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import HomePage from './scenes/home/Home';
+
 import { BrowserRouter, Route, Link } from "react-router-dom";
+import AppContainer from './scenes/home/AppContainer';
 
 ReactDOM.render(
     <BrowserRouter>
-        <HomePage />
+        <AppContainer />
     </BrowserRouter>
 , document.getElementById('root'));
 
