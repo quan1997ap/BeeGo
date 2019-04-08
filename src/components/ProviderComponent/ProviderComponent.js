@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './ProviderComponent.css';
-import HeaderComponent from '../HeaderComponent.js/HeaderComponent';
+import HeaderComponent from '../HeaderComponent/HeaderComponent';
 
 
 class ProviderComponent extends Component {

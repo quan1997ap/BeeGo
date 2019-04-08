@@ -1,8 +1,8 @@
 ﻿import React, { Component } from "react";
-import "./HomeComponent.css";
-import "./HomeComponentMore.css";
+import "../../styles/mainconfig.css";
+import "../../styles/main.css";
 
-class HomeComponent extends Component {
+class AdminComponent extends Component {
   render() {
     return (
       <div className="Home-component">
@@ -10,7 +10,7 @@ class HomeComponent extends Component {
           <div
             className="container-login100 Background-login"
           >
-            <p>home</p>
+            <p>admin</p>
           </div>
  
       </div>
@@ -18,4 +18,4 @@ class HomeComponent extends Component {
   }
 }
 
-export default HomeComponent;
+export default AdminComponent;

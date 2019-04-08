@@ -22,14 +22,18 @@ class SignUpComponent extends Component {
 
       usernameInputLostFocus: false,
       passwordInputLostFocus: false,
-      emailInputLostFocus: false
+      emailInputLostFocus: false,
+
+      resMessage: ""
     };
     // this.handleClick = this.handleClick.bind(this);
   }
 
   _selectTypeUser(typeUser) {
     this.setState({
-      typeuser: typeUser
+      typeuser: typeUser,
+      resMessage: ""
+
     });
   }
 
@@ -39,8 +43,11 @@ class SignUpComponent extends Component {
     userInfo.password = pass;
     userInfo.email = email;
     userInfo.type = type;
-    signUpService(userInfo).then(res => {
-      console.log(res);
+    signUpService(userInfo).then(resRegister => {
+      console.log(resRegister);
+      if (resRegister != undefined && resRegister.data.resut == false){
+        this.setState({resMessage : resRegister.data.message }) 
+      }
     });
   }
 
@@ -53,20 +60,7 @@ class SignUpComponent extends Component {
             <div className="wrap-login100 p-l-50 p-r-50 p-t-62 p-b-33 Scaledow-form-login">
               <form className="login100-form validate-form flex-sb flex-w">
                 <span className="login100-form-title p-b-15">Đăng kí</span>
-
-                {/* <a href="#" className="btn-face m-b-20">
-                  <i class="fab fa-facebook" />
-                  Facebook
-                </a>
-
-                <a href="#" className="btn-google m-b-20">
-                  <img
-                    src={require("../../assets/image/icon/icon-google.png")}
-                    alt="GOOGLE"
-                  />
-                  Google
-                </a> */}
-
+                
                 {/* username */}
                 <div className="p-t-31 p-b-9">
                   <span className="txt1">Tài khoản</span>
@@ -79,7 +73,8 @@ class SignUpComponent extends Component {
 
                     onChange={username => {
                         this.setState({
-                          username: username.target.value
+                          username: username.target.value,
+                          resMessage: ""
                         });
                     }}
 
@@ -112,7 +107,8 @@ class SignUpComponent extends Component {
                     name="password"
                     onChange={password => {
                         this.setState({
-                          password: password.target.value
+                          password: password.target.value,
+                          resMessage: ""
                         });
                     }}
                     onBlur={() => {
@@ -128,6 +124,7 @@ class SignUpComponent extends Component {
                   <span className="focus-input100" />
                 </div>
 
+                {/* email */}
                 <div className="p-t-13 p-b-9">
                   <span className="txt1">Email</span>
                 </div>
@@ -138,7 +135,8 @@ class SignUpComponent extends Component {
                     name="email"
                     onChange={email => {
                         this.setState({
-                          email: email.target.value
+                          email: email.target.value,
+                          resMessage: ""
                         });
                     }}
                     onBlur={() => {
@@ -154,6 +152,7 @@ class SignUpComponent extends Component {
                   <span className="focus-input100" />
                 </div>
 
+                {/* Loại tài khoản */}
                 <div className="p-t-13 p-b-9">
                   <span className="txt1">Loại tài khoản</span>
                 </div>
@@ -178,6 +177,11 @@ class SignUpComponent extends Component {
                   </Button>
                 </div>
 
+               {/* dang ki that bai */}
+                <div className="p-t-13 p-b-9">
+                  <span className="txt1 Input-invalid">{this.state.resMessage}</span>
+                </div>
+
                 <div className="container-login100-form-btn m-t-17">
                   <Button
                     onClick={this._registerUserInfo.bind(
@@ -195,6 +199,7 @@ class SignUpComponent extends Component {
                   >
                     Đăng kí
                   </Button>
+                  <span className="focus-input100" />
                 </div>
               </form>
             </div>

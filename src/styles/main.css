@@ -4,7 +4,7 @@
 .Background-login{
   background-repeat-y: repeat;
   background-repeat-x: no-repeat;
-  background-image: url('../../assets/image/bg-login.jpg') !important;
+  background-image: url('../assets//image/bg-login.jpg') !important;
 }
 
 .Font-size-20px{
@@ -17,7 +17,7 @@
 }
 
 .Scaledow-form-login{
-  transform: scale(0.8);
+  transform: scale(0.7);
 }
 
 /*---------------------------------------------*/
@@ -168,6 +168,7 @@ iframe {
   background: #fff;
   border-radius: 10px;
   position: relative;
+  top: -50px;
 }
 
 
@@ -487,12 +488,12 @@ iframe {
 }
 
 
-/* @media (max-width: 768px) {
+@media (max-width: 768px) {
   .wrap-login100 {
     padding-left: 60px;
     padding-right: 60px;
   }
-
+}
 @media (max-width: 576px) {
   .wrap-login100 {
     padding-left: 15px;
@@ -503,4 +504,4 @@ iframe {
   .btn-google {
     width: 100%;
   }
-} */
+}

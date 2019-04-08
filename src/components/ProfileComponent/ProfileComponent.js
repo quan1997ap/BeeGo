@@ -1,10 +1,18 @@
-import React, { Component } from 'react';
-import "./ProfileComponent.css"
+﻿import React, { Component } from "react";
+// import "../../styles/mainconfig.css";
+// import "../../styles/main.css";
+
 class ProfileComponent extends Component {
   render() {
     return (
       <div className="Profile-component">
-          <p>ProfilePage</p>
+      
+          <div
+            className="container-login100 Background-login"
+          >
+            <p>ProfileComponent</p>
+          </div>
+ 
       </div>
     );
   }

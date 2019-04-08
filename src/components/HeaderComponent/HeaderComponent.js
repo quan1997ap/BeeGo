@@ -15,30 +15,45 @@ const greenColorText = {
 };
 
 class HeaderComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state ={};
+  }
+  componentDidMount(){
+  }
+
   render() {
     return (
-      <div className="Header-app">
+      <div className="Header-app" id="Header">
         <div className="Reset-margin Header-app">
-          <div className="Full-width Header-background-first">
+          <div className="Full-width Header-background-first " id = "Header-menu">
             <Row className="Center Header-one">
               <a style={orangeColorText}>Bán hàng cùng BEEGO</a>
               <a style={greenColorText}>Chăm sóc khách hàng</a>
               <a style={whiteColorText}>Kiểm tra đơn hàng</a>
-              <Link to="/login" style={whiteColorText}>
+              <Link
+                to="/login"
+                style={whiteColorText}
+                className={this.props.hideLogin == true ? "Display-none" : ""}
+              >
                 Đăng nhập
               </Link>
-              <Link to="/signup" style={whiteColorText}>
+              <Link to="/signup" style={whiteColorText}
+                className={this.props.hideLogin == true ? "Display-none" : ""}
+              >
                 Đăng kí
               </Link>
-              <Link to="/profile" style={whiteColorText}>
+              <Link to="/profile" style={whiteColorText}
+                //  className={this.props.hideLogin == true ? "" : "Display-none"}
+              >
                 Thông tin cá nhân{" "}
               </Link>
             </Row>
           </div>
-          <Row className="Full-width Header-background-Second">
+          <Row className="Full-width Header-background-Second" id= "Search-header">
             <div className="Max-width Full-width">
               <Col xs={12} sm={4} md={3} lg={2}>
-                <Link to="/" >
+                <Link to="/">
                   <img
                     className="Logo-Beego"
                     src={require("../../assets/image/beego.png")}
@@ -57,7 +72,10 @@ class HeaderComponent extends Component {
                     <i className="fas fa-search" />
                   </Button>
                   <Button className="Height-control Your-cart">
-                    <i className="fas fa-cart-arrow-down" />
+                    <img
+                      className="Shopping-cart-icon"
+                      src={require("../../assets/image/icon/shopping-cart-not-null.png")}
+                    />
                   </Button>
                 </form>
               </Col>

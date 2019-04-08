@@ -11,7 +11,7 @@
   display: block;
 }
 .Input-invalid{
-  color: red;
+  color: red !important;
 }
 .Active-bg{
   background: linear-gradient(45deg, #00dbde, #fc00ff) !important; 

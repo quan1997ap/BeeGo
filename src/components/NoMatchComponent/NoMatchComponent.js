@@ -12,7 +12,12 @@ class NoMatchComponent extends Component {
             <div className="wrap-login100  wrap-login100 p-l-50 p-r-50 p-t-62 p-b-33">
              
                    <img src={require("../../assets/image/page-not-found.jpg")} className="Width-img"/>
-            
+                   <Button
+                      type='button'
+                      onClick={() => { this.props.history.push('/login') }}
+                    >
+                      Click Me!
+                    </Button>
             </div>
           </div>
         </div>
