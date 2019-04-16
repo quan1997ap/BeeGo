@@ -24,11 +24,18 @@ class SignUpComponent extends Component {
       passwordInputLostFocus: false,
       emailInputLostFocus: false,
 
-      resMessage: ""
+      resMessage: "",
+      componentDidMount: false
     };
     // this.handleClick = this.handleClick.bind(this);
   }
 
+  componentDidMount(){
+    // fix err when brower auto save username and password 
+    setTimeout( () => {
+      this.setState( {componentDidMount : true});
+    }, 1000);
+  }
   _selectTypeUser(typeUser) {
     this.setState({
       typeuser: typeUser,
@@ -36,6 +43,7 @@ class SignUpComponent extends Component {
 
     });
   }
+
 
   _registerUserInfo(name, pass, email, type) {
     let userInfo = new UseInfoModel();
@@ -55,8 +63,8 @@ class SignUpComponent extends Component {
   render() {
     return (
       <div className="SignIn-component">
-        <div className="limiter">
-          <div className="container-login100 Background-login">
+        <div className="limiter Background-login">
+          <div className="container-login100 Background-form-login">
             <div className="wrap-login100 p-l-50 p-r-50 p-t-62 p-b-33 Scaledow-form-login">
               <form className="login100-form validate-form flex-sb flex-w">
                 <span className="login100-form-title p-b-15">Đăng kí</span>

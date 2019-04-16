@@ -8,3 +8,14 @@ export function LoginService(dataLogin){
     type : dataLogin.type
   })
 } 
+
+export function ckeckTokenService(accessToken){
+  axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}` 
+  return axios.get(`${rootPath}/api/token/status`);
+} 
+
+export function getInfoUser(accessToken){
+  axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}` 
+  return axios.get(`${rootPath}/api/token/info`);
+} 
+

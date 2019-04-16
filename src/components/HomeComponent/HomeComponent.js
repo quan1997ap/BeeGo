@@ -8,7 +8,7 @@ class HomeComponent extends Component {
       <div className="Home-component">
       
           <div
-            className="container-login100 Background-login"
+            className="container-login100"
           >
             <p>home</p>
           </div>

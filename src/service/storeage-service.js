@@ -1,8 +1,8 @@
 export function getStorageService(storageName){
     return new Promise( (resolve, reject) => {
-      let token = localStorage.getItem(storageName);
-      if (token !== undefined){
-        resolve(token);
+      let dataLocal = localStorage.getItem(storageName);
+      if (dataLocal !== undefined){
+        resolve(dataLocal);
       } 
       else{
         resolve( `${storageName} invalid`);

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "./LoginComponent.css";
 import "./LoginComponentMore.css";
-import { Button, Alert } from 'react-bootstrap';
+import { Button } from "react-bootstrap";
 
 import {
   _validateEmail,
@@ -10,15 +10,10 @@ import {
 } from "../../configs/validates";
 import { AccoutLoginModel } from "../../model/userinfo.model";
 import { LoginService } from "../../service/login-service";
-import { getStorageService, setStorageService } from "../../service/storeage-service";
-
-import {
-  BrowserRouter as Router,
-  Route,
-  Link,
-  Redirect,
-  withRouter
-} from 'react-router-dom';
+import { setStorageService } from "../../service/storeage-service";
+import { BrowserRouter as Router, Redirect } from "react-router-dom";
+import { connect } from 'react-redux';
+import { Login } from "../../redux/actions/checkAuthorizeAction";
 
 class LoginComponent extends Component {
   constructor(props) {
@@ -35,24 +30,12 @@ class LoginComponent extends Component {
       emailInputLostFocus: false,
 
       resMessage: "",
-
-      redirectToReferrer: false
+      redirectToReferrer: false,
+      showPass: false,
+      componentDidMount: false
     };
   }
 
-  componentDidMount(){
-      getStorageService('token').then( token => {
-        if (token != undefined){
-          getStorageService('typeUser').then(
-            typeUser => {
-              this._navigate(typeUser)
-            }
-          )
-        }
-      }
-    )
-  }
-  
   _selectTypeUser(typeUser) {
     this.setState({
       typeuser: typeUser,
@@ -60,16 +43,17 @@ class LoginComponent extends Component {
     });
   }
 
-  _navigate(type){
-    if( type == "admin"){
-      this.props.history.push('/profile');
-    }
-    // if( type == "provider"){
-    //   this.props.history.push('/');
-    // }    
-    // if( type == "customer"){
-    //   this.props.history.push('/');
-    // }
+  _dispatchReduxLogin(){
+    this.props.dispatchReduxLogin(true);
+  }
+
+  componentDidMount() {
+    setTimeout( () => {
+      if (this.props.listState.isLogin === true){
+         this.setState({ redirectToReferrer: true})
+        //console.log(this.props.listState.isLogin === true)
+      }
+    }, 1000)
   }
 
   _loginWithUserAccount(pass, email, type) {
@@ -78,35 +62,31 @@ class LoginComponent extends Component {
     userAccount.type = type;
     userAccount.email = email;
     LoginService(userAccount).then(resLogin => {
-      console.log(resLogin)
-      if (resLogin != undefined && resLogin.data.result == false){
-        this.setState({resMessage : resLogin.data.message });
-      }
-      else if ( resLogin.data.result === true ){
-        setStorageService('typeUser', userAccount.type)
-        setStorageService('token', resLogin.data.token).then( () => 
-            {
-              this.setState({ redirectToReferrer: true });
-              this._navigate(userAccount.type)
-            }
-        );
+      console.log(resLogin);
+      if (resLogin !== undefined && resLogin.data.result === false) {
+        this.setState({ resMessage: resLogin.data.message });
+      } else if (resLogin.data.result === true) {
+        setStorageService("typeUser", userAccount.type);
+        setStorageService("token", resLogin.data.token).then(() => {
+          this._dispatchReduxLogin();
+          this.setState({ redirectToReferrer: true});
+        });
       }
     });
   }
 
   render() {
+    const { from } = this.props.location.state || { from: { pathname: "/" } };
+    const { redirectToReferrer } = this.state;
 
-    const { from } = this.props.location.state || { from: { pathname: '/' } }
-    const { redirectToReferrer } = this.state
-
-    if (redirectToReferrer === true) {
-      return <Redirect to={from} />
+    if (redirectToReferrer) {
+      return <Redirect to={from} />;
     }
 
     return (
       <div className="SignIn-component">
-        <div className="limiter">
-          <div className="container-login100 Background-login">
+        <div className="limiter Background-login">
+          <div className="container-login100 Background-form-login">
             <div className="wrap-login100 p-l-50 p-r-50 p-t-62 p-b-33 Scaledow-form-login">
               <form className="login100-form validate-form flex-sb flex-w">
                 <span className="login100-form-title p-b-15">Đăng nhập</span>
@@ -152,11 +132,14 @@ class LoginComponent extends Component {
                 <div className="p-t-13 p-b-9">
                   <span className="txt1">Mật khẩu</span>
 
-                  <a href="#" className="txt2 bo1 m-l-5">
+                  <a href="/" className="txt2 bo1 m-l-5">
                     Forgot?
                   </a>
                 </div>
                 <div className="wrap-input100 validate-input">
+                  {/* <FontAwesomeIcon icon="stroopwafel" /> */}
+                  {/* <Button onClick = { this.setState({showPass : true })} className={"Btn-show-hide-pass" + (this.state.showPass === true ? 'Display-inline' : 'Display-none')} > <i class="fas fa-eye"> </i></Button>
+                  <Button onClick = { this.setState({showPass : false })} className={"Btn-show-hide-pass" + (this.state.showPass !== true ? 'Display-inline' : 'Display-none')} > <i class="fas fa-eye-slash"> </i></Button> */}
                   <input
                     className="input100 fs-25"
                     type="password"
@@ -196,7 +179,7 @@ class LoginComponent extends Component {
                 <div className="wrap-input100 Switch-type-user">
                   <Button
                     className={
-                      "btn-type-user m-b-20 " +
+                      "btn-type-user-login m-b-20 " +
                       (this.state.typeuser === "customer" ? "Active-bg" : "")
                     }
                     onClick={this._selectTypeUser.bind(this, "customer")}
@@ -205,7 +188,7 @@ class LoginComponent extends Component {
                   </Button>
                   <Button
                     className={
-                      "btn-type-user m-b-20 " +
+                      "btn-type-user-login m-b-20 " +
                       (this.state.typeuser === "provider" ? "Active-bg" : "")
                     }
                     onClick={this._selectTypeUser.bind(this, "provider")}
@@ -215,14 +198,13 @@ class LoginComponent extends Component {
 
                   <Button
                     className={
-                      "btn-type-user m-b-20 " +
+                      "btn-type-user-login m-b-20 " +
                       (this.state.typeuser === "admin" ? "Active-bg" : "")
                     }
                     onClick={this._selectTypeUser.bind(this, "admin")}
                   >
                     Admin
                   </Button>
-
                 </div>
 
                 {/* dang ki that bai */}
@@ -242,17 +224,16 @@ class LoginComponent extends Component {
                     )}
                     className={
                       "login100-form-btn " +
-                      (
-                      this.state.password === "" ||
+                      (this.state.password === "" ||
                       this.state.email === "" ||
                       _validateEmail(this.state.email) === false
                         ? "Opacity-disable"
-                        : "btn-type-user-form-valid")
+                        : "btn-type-user-login-form-valid")
                     }
                     disabled={
-                      this.state.password === "" ||
+                      (this.state.password === "" ||
                       this.state.email === "" ||
-                      _validateEmail(this.state.email) === false
+                      _validateEmail(this.state.email) === false)
                         ? true
                         : false
                     }
@@ -269,4 +250,24 @@ class LoginComponent extends Component {
     );
   }
 }
-export default LoginComponent;
+
+
+const mapStateToProps = (state) => {
+  return {
+    listState: state
+  }
+}
+
+// isLogin == true => đã login // false => chưa login
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatchReduxLogin: (isLogin) => dispatch(Login(isLogin)),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(LoginComponent);
+
+// history.js:404 Throttling navigation to prevent the browser from hanging. See https://crbug.com/882238. Command line switch --disable-ipc-flooding-protection can be used to bypass the protection

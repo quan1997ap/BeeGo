@@ -6,9 +6,9 @@ class LoginComponent extends Component {
   render() {
     return (
       <div className="Login-component">
-        <div className="limiter">
+        <div className="limiter Background-login">
           <div
-            className="container-login100 Background-login"
+            className="container-login100 Background-form-login"
           >
             <div className="wrap-login100 p-l-50 p-r-50 p-t-62 p-b-33 Scaledow-form-login">
               <form className="login100-form validate-form flex-sb flex-w">
