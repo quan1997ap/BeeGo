@@ -6,9 +6,9 @@
 const checkAuthorizeReducer = (stateIsLogin = false , action) => {
     switch (action.type) {
       case 'LOGIN':
-        return action.isLogin;
+        return action.isLogin;// là giá trị mà checkAuthorizeAction.js trả về (isLogin)
       default:
-        return stateIsLogin;
+        return stateIsLogin;// giá trị mặc định khi không có giá trị
      
     }
 };

@@ -135,7 +135,7 @@
   top: 0;
 }
 .Style-search-header {
-    height: 90px;
+    /* height: 90px; */
     padding-top: 12px;
     transition: height  2s;
 }
@@ -290,7 +290,7 @@
     padding-top: 40px;
 }
 .Account-info::before{
-    content: url(../../assets/image/icon/account.png);
+    content: url(../../../assets//image/icon/account.png);
     background-repeat: no-repeat;
     position: absolute;
     top: 0;
@@ -323,7 +323,7 @@
     cursor: pointer;
 }
 .Top-cart-contain:before {
-    content: url(../../assets/image/icon/cart.png);
+    content: url(../../../assets/image/icon/cart.png);
     background-repeat: no-repeat;
     position: absolute;
     top: 0;
@@ -357,5 +357,32 @@
 /* header-search */
 
 /*  main menu*/
+    .Menu-cover{
+        background: #ea4242;
+        padding: 1px;
+        max-width: 100vw;
+    }
+    .Menu-inside-border-dotted{
+        border: 1px dotted #fff;
+        width: 100%;
+        margin: 0 auto;
+    }
+    .Menu-inside-border-dotted > .Row-menu{
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .Border-left-menu{
+        border-left: 1px solid #fff;
+    }
+    .Border-right-menu{
+        border-right: 1px solid #fff;
+    }
+    /* menu for admin */
+    .Child-Link{
+        height: 50px;
+        line-height: 50px;
+        color: white;
+    }
+    /* menu for provider */
 
 /*  main menu*/

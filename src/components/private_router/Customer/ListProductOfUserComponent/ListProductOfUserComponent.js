@@ -15,7 +15,9 @@ class ListProductOfUserComponent extends Component {
 
   render() {
     return(
-      <div></div>
+      <div>
+        list-product-of-user
+      </div>
     )
    
   }

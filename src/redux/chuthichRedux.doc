@@ -63,4 +63,4 @@ https://learn.co/lessons/map-dispatch-to-props-readme
             => Mỗi reducer(có nhiều action) => sẽ trả về 1 giá trị => gán giá trị này cho 1 cái tên như trong ( file rootReducer)
 
 
-2.4. 
+2.4. sai lầm https://medium.com/dailyjs/11-mistakes-ive-made-during-react-native-redux-app-development-8544e2be9a9

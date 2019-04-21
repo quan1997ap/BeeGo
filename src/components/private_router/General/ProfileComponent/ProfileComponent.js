@@ -1,11 +1,11 @@
 ﻿import React, { Component } from "react";
 import "./ProfileComponent.css";
-import { getInfoUser } from "../../service/login-service";
-import { getStorageService } from "../../service/storeage-service";
+import { getInfoUser } from "../../../../service/login-service";
+import { getStorageService } from "../../../../service/storeage-service";
 
 import { Button, Tabs, Tab, Table, Modal, Dialog} from "react-bootstrap";
-import { getListUserWithPermision } from "../../service/admin-service";
-import { blockUserService , unblockUserService} from '../../service/admin-service';
+import { getListUserWithPermision } from "../../../../service/admin-service";
+import { blockUserService , unblockUserService} from '../../../../service/admin-service';
 
 class ProfileComponent extends Component {
   constructor(props){
@@ -26,11 +26,11 @@ class ProfileComponent extends Component {
 
   _getListUserWithTokenAdmin(token){
     getListUserWithPermision(token, 'provider')
-    .then( res => this.setState({listProvider: res.data }, ()=> console.log(this.state.listProvider)))
+    .then( res => this.setState({listProvider: res.data }))
     .catch( e => this.setState({errGetProvider: e}) )
     
     getListUserWithPermision(token, 'customer')
-    .then( res => this.setState({listCustomer: res.data }, ()=> console.log(this.state.listCustomer)))
+    .then( res => this.setState({listCustomer: res.data }))
     .catch( e => this.setState({errGetCustomer: e}) )
   }
 

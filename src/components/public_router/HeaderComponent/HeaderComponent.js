@@ -3,8 +3,12 @@ import "./HeaderComponent.css";
 import { Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { connect } from 'react-redux';
-import { Login } from "../../redux/actions/checkAuthorizeAction";
-
+import { Login } from "../../../redux/actions/checkAuthorizeAction";
+import {
+  createBrowserHistory,
+  createHashHistory,
+  createMemoryHistory
+} from 'history'
 
 const orangeColorText = {
   color: "#f57224"
@@ -16,23 +20,24 @@ const greenColorText = {
   color: "#30c8dc"
 };
 
+
 class HeaderComponent extends Component {
+  
   constructor(props) {
     super(props);
     this.state = {};
   }
 
   _dispatchReduxLogOut(){
+    const { history, authed } = this.props;
     this.props.dispatchReduxLogOut(false);
     localStorage.removeItem("token");
     localStorage.removeItem("typeUser");
-    this.props.history.push('/');
+    history.push("/login");
+    //console.log(this.history);
   }
 
   componentDidMount(){
-    // setTimeout( () => {
-    //   console.log(this.props)
-    // }, 3000)
   }
 
   render() {
@@ -55,30 +60,6 @@ class HeaderComponent extends Component {
                 </a>
               </div>
             </Row>
-
-            {/* <Row className="Center Header-one">
-
-              <Link to="/list-product-of-user" style={orangeColorText}>Bán hàng cùng BEEGO</Link>
-              <Link to="/list-product-of-user" style={greenColorText}>Chăm sóc khách hàng</Link>
-              <Link to="/list-product-of-user" style={whiteColorText}>Kiểm tra đơn hàng</Link>
-              <Link
-                to="/login"
-                style={whiteColorText}
-                className={this.props.hideLogin === true ? "Display-none" : ""}
-              >
-                Đăng nhập
-              </Link>
-              <Link to="/signup" style={whiteColorText}
-                className={this.props.hideLogin === true ? "Display-none" : ""}
-              >
-                Đăng kí
-              </Link>
-              <Link to="/profile" style={whiteColorText}
-                //  className={this.props.hideLogin == true ? "" : "Display-none"}
-              >
-                Thông tin cá nhân{" "}
-              </Link>
-            </Row> */}
           </div>
 
           <div
@@ -87,11 +68,11 @@ class HeaderComponent extends Component {
           >
             <Row className="Max-width Full-width">
               <Col xs={12} sm={6} md={3} lg={3} className="No-padding">
-                <Link to="/">
+                <Link to="/" >
                   <img
                     alt="logo"
                     className="Logo-Beego"
-                    src={require("../../assets/image/beego.png")}
+                    src={require("../../../assets/image/beego.png")}
                   />
                 </Link>
               </Col>
@@ -127,25 +108,40 @@ class HeaderComponent extends Component {
               <Col xs={12} sm={6} md={1} lg={1} className="No-padding Cart">
                 <div className="Top-cart-contain">
                   <div className="mini-cart text-xs-center">
-                    <div className="heading-cart">
-                      <Link to="/list-product-of-user">
+                      <Link to="/list-product-of-user"  className="heading-cart">
                         <span className="cartCount count_item_pr" id="cart-total">
                           0
                         </span>
                         <span className="cart-text">Giỏ hàng</span>
                       </Link>
-                    </div>
                   </div>
                 </div>
               </Col>
               <Col xs={12} sm={6} md={2} lg={2}  className={ "No-padding Account "  + (this.props.listState.isLogin !== true ? "Display-none" : "")} >
-                <ul className="Account-info">
-                  <li>
-                    <Link to="/profile">Thông tin cá nhân</Link>
-                  </li>
-                </ul>
+                <Link to="/profile" className="Account-info">
+                  <li> Thông tin cá nhân  </li>
+                </Link>
               </Col>
             </Row>
+
+            <div className="Max-width Full-width Menu-cover">
+              <div className="Menu-inside-border-dotted"> 
+                <Row className="Row-menu">
+                    <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-left-menu Border-right-menu" >
+                        <Link to="/profile" className="Child-Link">Thông tin cá nhân</Link>
+                    </Col>
+                    <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
+                        <Link to="/profile" className="Child-Link">Thông tin cá nhân</Link>
+                    </Col>
+                    <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
+                        <Link to="/profile" className="Child-Link">Thông tin cá nhân</Link>
+                    </Col>
+                    <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
+                        <Link to="/profile" className="Child-Link">Thông tin cá nhân</Link>
+                    </Col>
+                </Row>
+              </div>
+            </div>
           </div>
         </div>
       </div>

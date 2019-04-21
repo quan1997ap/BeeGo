@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import "./SignUpComponent.css";
 import "./SignUpComponentMore.css";
 import { Button } from "react-bootstrap";
-import { signUpService } from "../../service/signup-service";
-import { UseInfoModel } from "../../model/userinfo.model";
+import { signUpService } from "../../../../service/signup-service";
+import { UseInfoModel } from "../../../../model/userinfo.model";
 
-import { _validateEmail , _maxLength , _minLength } from "../../configs/validates";
+import { _validateEmail , _maxLength , _minLength } from "../../../../configs/validates";
 
 class SignUpComponent extends Component {
   constructor(props) {

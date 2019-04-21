@@ -3,7 +3,6 @@
 import { combineReducers } from 'redux';
 import checkAuthorizeReducer from './authorizeReducer';
 
-
 const rootReducer = combineReducers({
    isLogin : checkAuthorizeReducer
 });
