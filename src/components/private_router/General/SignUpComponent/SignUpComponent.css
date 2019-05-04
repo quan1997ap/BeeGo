@@ -22,15 +22,19 @@
 }
 
 .Active-bg{
-  color: #fff;
+  color: #fff !important;
   box-shadow: none;
-  background-color: #dc3333;
+  background-color: #dc3333 !important;
 }
-
+.btn-type-user:hover{
+  color: #fff !important;
+  background-color: #ff4343 !important;
+  border: none;
+}
 .btn-type-user {
   width: 44% !important;
-  background-color: #dc3333;
-  color: white;
+  background-color:#FFF;
+  color: #333;
   font-size: 22px;
   line-height: 1.2rem;
   padding: 15px;

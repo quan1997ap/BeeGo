@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import "./AppContainer.css";
 import {
-  createBrowserHistory,
-  createHashHistory,
-  createMemoryHistory
+  createBrowserHistory
 } from 'history'
 
 import {
@@ -22,40 +20,26 @@ import rootReducer from "../../redux/reducers/rootReduces";
 import { Login } from "../../redux/actions/checkAuthorizeAction";
 import { Button } from "react-bootstrap";
 
-import ProfileComponent from "../../components/private_router/General/ProfileComponent/ProfileComponent";
+// import ProfileComponent from "../../components/private_router/General/ProfileComponent/ProfileComponent";
 import HeaderComponent from "../../components/public_router/HeaderComponent/HeaderComponent";
 import LoginComponent from "../../components/private_router/General/LoginComponent/LoginComponent";
 import SignUpComponent from "../../components/private_router/General/SignUpComponent/SignUpComponent";
 import NoMatchComponent from "../../components/public_router/NoMatchComponent/NoMatchComponent";
 import HomeComponent from "../../components/public_router/HomeComponent/HomeComponent";
 import ListProductOfUserComponent from "../../components/private_router/Customer/ListProductOfUserComponent/ListProductOfUserComponent";
+import LoadingComponent from "../../components/public_router/LoadingComponent/LoadingComponent";
 import PrivateRoute from "./PrivateRoute";
+import FooterWithRouter from "../../components/public_router/FooterComponent/FooterComponent";
+import ManageCategoryComponent from "../../components/private_router/Admin/ManageCategoryComponent/ManageCategoryComponent";
+import ManageDiscountComponent from "../../components/private_router/Admin/ManageDiscountComponent/ManageDiscountComponent";
+import ManagePaymentComponent from "../../components/private_router/Admin/ManagePaymentComponent/ManagePaymentComponent";
+import ManageUserComponent from "../../components/private_router/Admin/ManageUserComponent/ManageUserComponent";
+import NotificationPermissionComponent from "../../components/public_router/NotificationPermissionComponent/NotificationPermissionComponent";
+
+
 
 // Create store
 const store = createStore(rootReducer);
-
-// /* PrivateRoute component definition */
-// const PrivateRoute = ({ component: Component, ...rest }) => {
-
-//   if (
-//     authed === undefined
-//   ){
-//     return(<LoadingComponent auth= {authed} />)
-//   }
-//   else{
-//     return (
-//       <Route
-//         {...rest}
-//         render={props =>
-//          {
-//           if (authed === true) {return  <Component {...props} /> }
-//           else if (authed === false) { return  <Redirect to={{ pathname: "/login", state: { from: props.location } }}  />}
-//          }
-//         }
-//       />
-//     );
-//   }
-// };
 
 // appContainer => 1 pageForm
 // khi mới vào app => check isAuthenticated để đưa vào trong private Router như 1 prop => xác định có cho router đến k
@@ -64,12 +48,12 @@ class AppContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isAuthenticated: undefined,
-      label: "lable"
+      isAuthenticated: undefined
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
+    // console.log(store.getState());
     window.addEventListener("scroll", this._handleScroll);
     // check token dang nhap
     getStorageService("token").then(token => {
@@ -77,12 +61,10 @@ class AppContainer extends Component {
         ckeckTokenService(token).then(statusToken => {
           if (statusToken.status === 200) {
             store.dispatch(Login(true));
-            this.setState({ label: "true" });
             this.setState({ isAuthenticated: true });
           }
         });
       } else {
-        this.setState({ label: "false" });
         store.dispatch(Login(false));
         this.setState({ isAuthenticated: false }, () => {
           console.log(this.state.isAuthenticated);
@@ -100,26 +82,31 @@ class AppContainer extends Component {
     let wrapRouter = document.getElementById("Wrap-router");
     let searchHeader = document.getElementById("Search-header");
     let headerMenu = document.getElementById("Header-menu");
+    let detailMenu = document.getElementById("Menu-detail");
 
     let positionScrollBar = window.scrollY;
-
-    if (positionScrollBar < 25) {
-      wrapRouter.style.marginTop = 0;
-      Header.classList.remove("Position-fixed");
-      searchHeader.classList.remove("Style-search-header");
-      headerMenu.classList.remove("Style-menu-header");
+    // console.log(positionScrollBar)
+    if (positionScrollBar < 45 ) {
+      detailMenu.classList.remove("Display-none");
+      if (positionScrollBar < 25) {
+        wrapRouter.style.marginTop = 0;
+        Header.classList.remove("Position-fixed");
+        searchHeader.classList.remove("Style-search-header");
+        headerMenu.classList.remove("Style-menu-header");
+      }
     } else {
       wrapRouter.style.marginTop = "90px";
       Header.classList.add("Position-fixed");
       searchHeader.classList.add("Style-search-header");
       headerMenu.classList.add("Style-menu-header");
+      detailMenu.classList.add("Display-none");
     }
   }
 
   render() {
     return (
       <Provider store={store}>
-        <Router>
+        <Router basename={'/beego'} >
           <div className="App-container">
             <HeaderComponent />
             {/* chú ý private router => nếu pass props thông thường (auth = {isAuthenticated}) => không nhận dc
@@ -128,22 +115,22 @@ class AppContainer extends Component {
               <Switch>
                 <Route history={createBrowserHistory} path="/" exact component={HomeComponent} />
                 <Route path="/signup" exact component={SignUpComponent} />
-                <Route path="/login" exact component={LoginComponent} />
-                <PrivateRoute
-                  path="/list-product-of-user"
-                  exact
-                  authed={store.getState().isLogin}
-                  component={ListProductOfUserComponent}
-                />
-                <PrivateRoute
-                  exact
-                  path="/profile"
-                  authed={store.getState().isLogin}
-                  component={ProfileComponent}
-                />
+                <Route path="/login" exact component={LoginComponent}/>
+                {/* Provider */}
+                <PrivateRoute path="/list-product-of-user"  exact  authed={store.getState().isLogin} component={ListProductOfUserComponent} />                  
+               
+                {/* Admin */}
+                <PrivateRoute  path="/manage" exact authed={store.getState().isLogin} roleUser = "admin" component={ManageUserComponent} />
+                <PrivateRoute  path="/manage/user-account" exact authed={store.getState().isLogin} roleUser = "admin" component={ManageUserComponent} />
+                <PrivateRoute  path="/manage/category" exact authed={store.getState().isLogin} roleUser = "admin" component={ManageCategoryComponent} />
+                <PrivateRoute  path="/manage/discount" exact authed={store.getState().isLogin} roleUser = "admin" component={ManageDiscountComponent} />
+                <PrivateRoute  path="/manage/payment" exact authed={store.getState().isLogin} roleUser = "admin" component={ManagePaymentComponent} />
+
+
                 <Route component={NoMatchComponent} />
               </Switch>
             </div>
+            <FooterWithRouter />
           </div>
         </Router>
       </Provider>
@@ -153,3 +140,4 @@ class AppContainer extends Component {
 
 export default AppContainer;
 //Router https://www.sitepoint.com/react-router-v4-complete-guide/
+// 1337x.to

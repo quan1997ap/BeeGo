@@ -4,9 +4,6 @@
     width: 100% !important;
     height: 32px;
 }
-.whiteColorText{
-    color: #fff !important;
-}
 .Container-custom{
     max-width: 1200px;
     width: 100%;
@@ -24,8 +21,6 @@
 }
 .Cart{
     padding-top: 15px !important;
-    display: flex;
-    justify-content: center;
 }
 .Container-custom > span{
     float: left;
@@ -56,11 +51,6 @@
 .Logout-button:focus {
     box-shadow: none;
     border-right: 1px solid #ebebeb;
-}
-.Logout-button:active {
-    box-shadow: none !important  ;
-    outline: none !important;
-    border-right: 1px solid #ebebeb !important;
 }
 .Container-custom > a{
     width: 32px;
@@ -330,8 +320,6 @@
     position: relative;
     padding-top: 38px;
     cursor: pointer;
-    display: block;
-    flex: 1;
 }
 .Top-cart-contain:before {
     content: url(../../../assets/image/icon/cart.png);
@@ -389,15 +377,10 @@
         border-right: 1px solid #fff;
     }
     /* menu for admin */
-    .Child-Link1{
+    .Child-Link{
         height: 50px;
         line-height: 50px;
-        display: block;
-        color: #333;
-    }
-    .Child-Link1:hover{
-        text-decoration: none;
-        color: white !important;
+        color: white;display: block;
     }
     /* menu for provider */
 

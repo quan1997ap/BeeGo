@@ -1,16 +1,23 @@
-.lds-ripple {
-  display: inline-block;
-  position: relative;
-  width: 64px;
-  height: 64px;
-}
-.lds-ripple div {
+.full-screen{
+  right: 0;
   position: absolute;
-  border: 4px solid #fff;
-  opacity: 1;
-  border-radius: 50%;
-  animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  width: 100vw;
+  height: 200vh;
+  background: rgba(0,0,0, 0.4);
+  z-index: 100000;
+  top: 0;
+  padding-top: calc(50vh - 50px);
+
 }
-.lds-ripple div:nth-child(2) {
-  animation-delay: -0.5s;
+.spiner{
+  color: brown;
+  background-color: brown; 
+}
+._loading_overlay_content{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color:#fff;
+  font-weight: 500
 }

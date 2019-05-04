@@ -9,11 +9,22 @@ import {
   _minLength
 } from "../../../../configs/validates";
 import { AccoutLoginModel } from "../../../../model/userinfo.model";
-import { LoginService, ckeckTokenService } from "../../../../service/login-service";
-import { setStorageService, getStorageService } from "../../../../service/storeage-service";
+import {
+  loginService,
+  ckeckTokenService
+} from "../../../../service/login-service";
+import {
+  setStorageService,
+  getStorageService
+} from "../../../../service/storeage-service";
 import { BrowserRouter as Router, Redirect } from "react-router-dom";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 import { Login } from "../../../../redux/actions/checkAuthorizeAction";
+import {
+  ToastsContainer,
+  ToastsStore,
+  ToastsContainerPosition
+} from "react-toasts";
 
 class LoginComponent extends Component {
   constructor(props) {
@@ -33,7 +44,8 @@ class LoginComponent extends Component {
       redirectToReferrer: false,
       showPass: false,
       componentDidMount: false,
-      isFirst: true
+      isFirst: true,
+      from: "/"
     };
   }
 
@@ -44,28 +56,33 @@ class LoginComponent extends Component {
     });
   }
 
-  _dispatchReduxLogin(isLogin){
+  _dispatchReduxLogin(isLogin) {
     this.props.dispatchReduxLogin(isLogin);
   }
 
   componentDidMount() {
-    getStorageService("token").then(token => {
-      if (token !== null && token !== "token invalid") {
-        ckeckTokenService(token).then(
-          statusToken => {
-            if (statusToken.status === 200) {
-              this._dispatchReduxLogin(true);
-              this.setState({ redirectToReferrer: true});
-            }
-          }
-        )
-      }
-      else{
-        this.setState({ redirectToReferrer: false});
-        this._dispatchReduxLogin(false);
-      }
-    });
+    // lưu pathname của private => đăng nhập xong => chuyển sang
+    let token = localStorage.getItem("token");
+    console.log(this.props.location.state);
+    if (this.props.location.state !== undefined) {
+      this.setState({
+        from: { pathname: `${this.props.location.state.detail}` }
+      });
+    } else {
+      this.setState({ from: { pathname: "/" } });
+    }
 
+    if (token !== null && token !== "token invalid") {
+      ckeckTokenService(token).then(statusToken => {
+        if (statusToken.status === 200) {
+          this._dispatchReduxLogin(true);
+          this.setState({ redirectToReferrer: true });
+        }
+      });
+    } else {
+      this.setState({ redirectToReferrer: false });
+      this._dispatchReduxLogin(false);
+    }
   }
 
   _loginWithUserAccount(pass, email, type) {
@@ -73,7 +90,7 @@ class LoginComponent extends Component {
     userAccount.password = pass;
     userAccount.type = type;
     userAccount.email = email;
-    LoginService(userAccount).then(resLogin => {
+    loginService(userAccount).then(resLogin => {
       console.log(resLogin);
       if (resLogin !== undefined && resLogin.data.result === false) {
         this.setState({ resMessage: resLogin.data.message });
@@ -81,28 +98,36 @@ class LoginComponent extends Component {
         setStorageService("typeUser", userAccount.type);
         setStorageService("token", resLogin.data.token).then(() => {
           this._dispatchReduxLogin(true);
-           this.setState({ redirectToReferrer: true});
+          ToastsStore.success("Thêm category thành công");
+          this.setState({ redirectToReferrer: true });
         });
       }
-    });
+    }).catch(
+      (errLogin) => {
+        console.log(errLogin);
+        ToastsStore.error("Có lỗi xảy ra, hãy đăng nhập lại !");
+      } 
+    )
   }
 
   render() {
-    const { from } = this.props.location.state || { from: { pathname: "/" } };
-    const { redirectToReferrer } = this.state;
+    const { redirectToReferrer, from } = this.state;
 
     if (true === redirectToReferrer) {
       return <Redirect to={from} />;
-    }
-    else if(false === redirectToReferrer ){
+    } else if (false === redirectToReferrer) {
       return (
         <div className="SignIn-component">
+          <ToastsContainer
+            store={ToastsStore}
+            position={ToastsContainerPosition.TOP_RIGHT}
+          />
           <div className="limiter Background-login">
             <div className="container-login100 Background-form-login">
               <div className="wrap-login100 p-l-50 p-r-50 p-t-62 p-b-33 Scaledow-form-login">
                 <form className="login100-form validate-form flex-sb flex-w">
                   <span className="login100-form-title p-b-15">Đăng nhập</span>
-  
+
                   {/* email */}
                   <div className="p-t-13 p-b-9">
                     <span className="txt1">Email</span>
@@ -139,11 +164,11 @@ class LoginComponent extends Component {
                     </div>
                     <span className="focus-input100" />
                   </div>
-  
+
                   {/* password */}
                   <div className="p-t-13 p-b-9">
                     <span className="txt1">Mật khẩu</span>
-  
+
                     <a href="/" className="txt2 bo1 m-l-5">
                       Forgot?
                     </a>
@@ -177,11 +202,12 @@ class LoginComponent extends Component {
                           : "Display-none")
                       }
                     >
-                      Bạn phải nhập mật khẩu tối thiểu 4 kí tự và tối đa 30 kí tự
+                      Bạn phải nhập mật khẩu tối thiểu 4 kí tự và tối đa 30 kí
+                      tự
                     </div>
                     <span className="focus-input100" />
                   </div>
-  
+
                   <div className="p-t-13 p-b-9">
                     <span className="txt1">Loại tài khoản</span>
                   </div>
@@ -204,7 +230,7 @@ class LoginComponent extends Component {
                     >
                       Người bán
                     </Button>
-  
+
                     <Button
                       className={
                         "btn-type-user-login m-b-20 " +
@@ -215,14 +241,14 @@ class LoginComponent extends Component {
                       Admin
                     </Button>
                   </div>
-  
+
                   {/* dang ki that bai */}
                   <div className="p-t-13 p-b-9">
                     <span className="txt1 Input-invalid">
                       {this.state.resMessage}
                     </span>
                   </div>
-  
+
                   <div className="container-login100-form-btn m-t-17">
                     <Button
                       onClick={this._loginWithUserAccount.bind(
@@ -240,9 +266,9 @@ class LoginComponent extends Component {
                           : "btn-type-user-login-form-valid")
                       }
                       disabled={
-                        (this.state.password === "" ||
+                        this.state.password === "" ||
                         this.state.email === "" ||
-                        _validateEmail(this.state.email) === false)
+                        _validateEmail(this.state.email) === false
                           ? true
                           : false
                       }
@@ -261,17 +287,16 @@ class LoginComponent extends Component {
   }
 }
 
-
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     listState: state
-  }
-}
+  };
+};
 
 // isLogin == true => đã login // false => chưa login
 const mapDispatchToProps = dispatch => {
   return {
-    dispatchReduxLogin: (isLogin) => dispatch(Login(isLogin)),
+    dispatchReduxLogin: isLogin => dispatch(Login(isLogin))
   };
 };
 

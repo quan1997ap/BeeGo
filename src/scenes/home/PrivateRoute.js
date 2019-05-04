@@ -3,72 +3,87 @@ import { connect } from "react-redux";
 import LoadingComponent from "../../components/public_router/LoadingComponent/LoadingComponent";
 import { Route, Redirect, withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
-import { getStorageService } from "../../service/storeage-service";
+import {  } from "../../service/storeage-service";
 import { ckeckTokenService } from "../../service/login-service";
+import NotificationPermissionComponent from "../../components/public_router/NotificationPermissionComponent/NotificationPermissionComponent";
 
 class PrivateRoute extends Component {
-  state = {
-    haveAcces: false,
-    loaded: false
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      haveAcces: false,
+      loaded: false
+    };
+  }
 
-  componentDidMount() {
+  componentWillMount() {
     this.checkAcces();
-    // console.log(this.props.authed);
   }
 
   checkAcces = () => {
-    const { history, authed } = this.props;
-    let { haveAcces } = this.state;
-
-    // your fetch request
-    if (authed == true) {
-      this.setState({
-        haveAcces: true,
-        loaded: true
-      });
-    }
-    else{
-      getStorageService("token").then(token => {
-        if (token !== null && token !== "token invalid") {
-          ckeckTokenService(token).then(statusToken => {
-            if (statusToken.status === 200) {
-               console.log('vao');
-              this.setState({
-                haveAcces: true,
-                loaded: true
-              });
-            }
+    const { history, authed, roleUser } = this.props;
+    let tokenInLocalStorage = localStorage.getItem("token");
+    // ĐÃ ĐĂNG NHẬP VÀ CÓ TOKEN
+    ckeckTokenService(tokenInLocalStorage).then(resCheckToken => {
+       //console.log(resCheckToken );
+      if (roleUser === resCheckToken.data.role &&  'live' === resCheckToken.data.status ){
+        // TOKEN  ĐÚNG VÀ QUYỀN ĐÚNG => BỎ LOADING =>CHO VÀO TRANG PRIVATE
+        this.setState({loaded: true, haveAcces : true}, () => {
+          history.push(`${this.props.path}`);
+        })
+      }
+      else{
+        console.log('k oke');
+        // TOKEN  ĐÚNG VÀ QUYỀN KHÔNG ĐÚNG => BỎ LOADING => CHO VÀO TRANG THÔNG BÁO => TRANG THÔNG BÁO SẼ QUYẾT ĐỊNH CÓ CHO ĐĂNG NHẬP TIẾP HAY TRỞ VỀ TRANG TRƯỚC
+        this.setState({loaded: true, haveAcces : false}, () => {
+          history.push({
+            pathname: "/login",
+            state: { detail: this.props.path }
           });
-        } else {
-           console.log('k vao');
+        })
+      }
+        
+      })
+    .catch((error) => {
+      // CHƯA ĐĂNG NHẬP => BẮT ĐĂNG NHẬP
+      // 404: Not found - không tìm thấy
+      // 401: Unauthorized - Không có quyền
+      // 403: Forbidden - Bị cấm truy nhập:
+        const errCode = parseInt(error.response && error.response.status);
+        if (errCode === 403){
           this.setState({
-            haveAcces: false,
-            loaded: false
-          });
-          history.push("/login");
+            loaded: true,
+            haveAcces : false
+          },() => {
+            // token không  đúng 
+            history.push({
+              pathname: "/login",
+              state: { detail: this.props.path }
+            });
+          })
         }
-      });
-    }
-  };
+    });
+  }
 
   render() {
     const { component: Component, ...rest } = this.props;
     const { loaded, haveAcces } = this.state;
-    if (!loaded) return null;
-    return (
+    return loaded === true ? (
       <Route
         {...rest}
         render={props => {
-          return haveAcces ? (
-            <Component {...props} />
+          return haveAcces === true ? (
+            <Route path={this.props.path} component={this.props.component} />
           ) : (
-            <Redirect
-              to={{ pathname: "/login", state: { from: props.location } }}
-            />
+            // <Redirect
+            //   to={{ pathname: "/login", state: { from: props.location } }}
+            // />
+            <Route component={LoadingComponent} />
           );
         }}
       />
+    ) : (
+      <Route component={LoadingComponent} />
     );
   }
 }
@@ -78,5 +93,3 @@ export default withRouter(PrivateRoute);
 // PrivateRoute.propTypes = {
 //   userRole: PropTypes.string.isRequired,
 // };
-
-// https://stackoverflow.com/questions/49309071/react-private-router-with-async-fetch-request

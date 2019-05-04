@@ -4,11 +4,7 @@ import { Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { connect } from 'react-redux';
 import { Login } from "../../../redux/actions/checkAuthorizeAction";
-import {
-  createBrowserHistory,
-  createHashHistory,
-  createMemoryHistory
-} from 'history'
+import { Route, Redirect, withRouter } from 'react-router-dom';
 
 const orangeColorText = {
   color: "#f57224"
@@ -25,7 +21,15 @@ class HeaderComponent extends Component {
   
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      currentPathName : ""
+    };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.location !== prevProps.location) {
+      this.setState({currentPathName : this.props.location.pathname}) ;
+    }
   }
 
   _dispatchReduxLogOut(){
@@ -33,13 +37,13 @@ class HeaderComponent extends Component {
     this.props.dispatchReduxLogOut(false);
     localStorage.removeItem("token");
     localStorage.removeItem("typeUser");
-    history.push("/login");
-    //console.log(this.history);
+    history.push("/");
   }
 
   componentDidMount(){
+    console.log(this.props.location.pathname)
+    this.setState({currentPathName : this.props.location.pathname}) ;
   }
-
   render() {
     return (
       <div className="Header-app" id="Header">
@@ -106,38 +110,34 @@ class HeaderComponent extends Component {
                 </ul>
               </Col>
               <Col xs={12} sm={6} md={1} lg={1} className="No-padding Cart">
-                <div className="Top-cart-contain">
-                  <div className="mini-cart text-xs-center">
-                      <Link to="/list-product-of-user"  className="heading-cart">
-                        <span className="cartCount count_item_pr" id="cart-total">
-                          0
-                        </span>
-                        <span className="cart-text">Giỏ hàng</span>
-                      </Link>
-                  </div>
-                </div>
+                <Link to="/list-product-of-user"  className="Top-cart-contain heading-cart">
+                  <span className="cartCount count_item_pr" id="cart-total">
+                    0
+                  </span>
+                  <span className="cart-text">Giỏ hàng</span>
+                </Link>
               </Col>
               <Col xs={12} sm={6} md={2} lg={2}  className={ "No-padding Account "  + (this.props.listState.isLogin !== true ? "Display-none" : "")} >
-                <Link to="/profile" className="Account-info">
-                  <li> Thông tin cá nhân  </li>
+                <Link to="/manage" className="Account-info">
+                  <li> Trang cá nhân  </li>
                 </Link>
               </Col>
             </Row>
 
-            <div className="Max-width Full-width Menu-cover">
+            <div className="Full-width Menu-cover">
               <div className="Menu-inside-border-dotted"> 
-                <Row className="Row-menu">
+                <Row className="Row-menu" id = "Menu-detail">
                     <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-left-menu Border-right-menu" >
-                        <Link to="/profile" className="Child-Link">Thông tin cá nhân</Link>
+                        <Link to="/manage/user-account"  style={{ color : this.state.currentPathName === "/manage/user-account" ||  this.state.currentPathName === "/manage"  ? "#fff" : "" }} className={"Child-Link1"} >Quản lý người dùng</Link>
                     </Col>
                     <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
-                        <Link to="/profile" className="Child-Link">Thông tin cá nhân</Link>
+                        <Link to="/manage/category"  style={{ color : this.state.currentPathName === "/manage/category" ? "#fff" : "" }} className="Child-Link1">Quản lý danh mục</Link>
                     </Col>
                     <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
-                        <Link to="/profile" className="Child-Link">Thông tin cá nhân</Link>
+                        <Link to="/manage/discount"  style={{ color : this.state.currentPathName === "/manage/discount" ? "#fff" : "" }} className="Child-Link1">Quản lý mã giảm giá</Link>
                     </Col>
                     <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
-                        <Link to="/profile" className="Child-Link">Thông tin cá nhân</Link>
+                        <Link to="/manage/payment"  style={{ color : this.state.currentPathName === "/manage/payment" ? "#fff" : "" }} className="Child-Link1">Quản lý phương thức thanh toán</Link>
                     </Col>
                 </Row>
               </div>
@@ -151,6 +151,9 @@ class HeaderComponent extends Component {
 
 // listState : tên đặt cho danh sách các state mà lấy ra được từ store
 // state là danh sách tất cả các state => có thể lấy riêng rẽ => state.isLogin
+
+const  HeaderWithRouter =  withRouter(HeaderComponent);
+
 const mapStateToProps = (state) => {
   return {
     listState: state
@@ -164,4 +167,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HeaderComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(HeaderWithRouter);
