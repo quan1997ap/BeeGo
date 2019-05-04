@@ -101,8 +101,8 @@ class ManagePaymentComponent extends Component {
     const listItems = list.map((item, index) => (
       <tr key={index}>
         <td>{index}</td>
-        <td>{item.name}</td>
-        <td><ReadMoreReact  min={20} max={300} readMoreText={"Xem thêm"} text={item.description} /></td>
+        <td className="text-left">{item.name}</td>
+        <td className="text-left"><ReadMoreReact  min={20} max={300} readMoreText={"Xem thêm"} text={item.description} /></td>
       </tr>
     ));
     return (
