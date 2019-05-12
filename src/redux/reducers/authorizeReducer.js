@@ -3,12 +3,12 @@
 // function chi tiet cua Action
 // đối chiếu action.type bên file checkoAuthorizeAction.js => xác nhận sẽ thực hiện Action nào
 
-const checkAuthorizeReducer = (stateIsLogin = false , action) => {
+const checkAuthorizeReducer = (authenticationInfoDefault= { isLogin: false, role: null} , action) => {
     switch (action.type) {
       case 'LOGIN':
-        return action.isLogin;// là giá trị mà checkAuthorizeAction.js trả về (isLogin)
+        return action.authenticationInfo;// là giá trị mà checkAuthorizeAction.js trả về (isLogin)
       default:
-        return stateIsLogin;// giá trị mặc định khi không có giá trị
+        return authenticationInfoDefault;// giá trị mặc định khi không có giá trị
      
     }
 };

@@ -40,13 +40,12 @@ class ManagePaymentComponent extends Component {
     getListPaymentWithPermision(0, 10).then(
       resPayment => {
         this.setState(
-          { listPayment : resPayment.data , getListPaymentSuccess : true}, () => {console.log(this.state.listPayment)}
+          { listPayment : resPayment.data , getListPaymentSuccess : true}
         );
       }
     ).catch(
       e => {
         console.log(e);
-
       }
     )
   }
@@ -101,8 +100,8 @@ class ManagePaymentComponent extends Component {
     const listItems = list.map((item, index) => (
       <tr key={index}>
         <td>{index}</td>
-        <td className="text-left">{item.name}</td>
-        <td className="text-left"><ReadMoreReact  min={20} max={300} readMoreText={"Xem thêm"} text={item.description} /></td>
+        <td className="text-left phuong-thuc-tt">{item.name}</td>
+        <td className="text-left"><ReadMoreReact  min={70} max={300} readMoreText={"Xem thêm"} text={item.description} /></td>
       </tr>
     ));
     return (

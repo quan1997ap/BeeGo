@@ -129,7 +129,12 @@ textarea {
 textarea:focus, input:focus {
   border-color: #dc3333 !important;
 }
-
+.success-register-text{
+  width: 100%;
+  color: #28a745;
+  font-size: 20px;
+  margin-top: 35px;
+}
 input:focus::-webkit-input-placeholder { color:transparent; }
 input:focus:-moz-placeholder { color:transparent; }
 input:focus::-moz-placeholder { color:transparent; }

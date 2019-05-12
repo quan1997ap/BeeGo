@@ -31,6 +31,33 @@ export function unblockUserService(userID){
   });
 } 
 
+export function blockMultiUserService(arrID){
+  return http.post(`${rootPath}/api/admin/user/change-block`,
+  {
+    ids: arrID ,
+    isBlock: true
+  },
+  {
+    cancelToken: new CancelToken(function executor(c) {
+      cancel = c;
+    })
+  });
+} 
+
+export function unblockMultiUserService(arrID){
+  return http.post(`${rootPath}/api/admin/user/change-block`,
+  {
+    ids: arrID ,
+    isBlock: false
+  },
+  {
+    cancelToken: new CancelToken(function executor(c) {
+      cancel = c;
+    })
+  });
+}
+
+
 // manage Category
 export function getALLCategory(){
   return http.get(`${rootPath}api/admin/category/list`,{

@@ -274,6 +274,11 @@
     font-weight: bold;
     word-break: break-word;
 }
+.Button-search:hover {
+    color: #fff;
+    background-color: #dc3333 !important;
+    border-color: #dc3333 !important;
+}
 .Input-search::placeholder{
     color: #757575;
 }

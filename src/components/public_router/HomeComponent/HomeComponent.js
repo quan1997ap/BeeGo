@@ -1,16 +1,24 @@
 ﻿import React, { Component } from "react";
-import "../../../styles/mainconfig.css";
-import "../../../styles/main.css";
+import { SliderCategory } from "./SliderCategory/SliderCategory";
+import "./HomeComponent.css";
+import { SliderAdvert } from "./SliderAdvert/SliderAdvert";
+import { ListIProduct } from "./ListIProduct/ListIProduct";
 
 class HomeComponent extends Component {
+  componentDidMount(){
+  } 
   render() {
     return (
       <div className="Home-component">
-      
           <div
-            className="container-login100"
+            className="container-home"
           >
-            <p>home</p>
+            <SliderAdvert />
+            <SliderCategory />
+            <ListIProduct />
+            <ListIProduct />
+            <ListIProduct />
+            <ListIProduct />
           </div>
  
       </div>

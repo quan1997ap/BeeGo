@@ -14,6 +14,7 @@ import {
 } from "react-toasts";
 import { CategoryInfoModel } from "../../../../model/categoryinfo.model";
 import axios from "axios";
+import ReadMoreReact from 'read-more-react';
 
 // y tưởng :
 // Dùng phương pháp đệ quy => biến đổi từ mảng chứa tất cả các category => mảng Lồng nhau(cha chứa con)
@@ -79,6 +80,7 @@ class ManageCategoryComponent extends Component {
         );
       });
     }
+    console.log(arrResultInterpolation);
     return arrResultInterpolation;
   }
 
@@ -177,6 +179,9 @@ class ManageCategoryComponent extends Component {
     return listOption;
   }
 
+  subString(string, minLength,maxLength){
+
+  }
   _renderListCategory(listCategory) {
     // nội suy để tạo table các category
     let listCategoryDetail;
@@ -188,11 +193,15 @@ class ManageCategoryComponent extends Component {
             key={"level-" + itemCategory._id}
             className={"div-lever div-level-" + itemCategory.level}
           >
-            <div> {itemCategory.name} </div>
+            <div> <ReadMoreReact min={20}  max={100} readMoreText={"xem thêm"} text={itemCategory.name} /> </div>
             <div className="div-lever-col-2"> {itemCategory._id}</div>
             <div className="div-lever-col-3">
               {" "}
               {itemCategory.isShow.toString()}
+            </div>
+            <div>
+              <Button className="edit-button">Edit</Button>
+              <Button className="delete-button">Del</Button>
             </div>
           </div>
         );
@@ -225,7 +234,7 @@ class ManageCategoryComponent extends Component {
             
             if (newCategory._id !== null && newCategory.parentId !== "") {
               this.setState(
-                {
+                { 
                   listSourceCategory: this.state.listSourceCategory.concat([
                     {
                       parentId: {
@@ -255,6 +264,7 @@ class ManageCategoryComponent extends Component {
                   );
                   this.setState(
                     {
+                      categoryName: "",
                       addSuccess: true,
                       showSuccessMessage: true,
                       listCategory: convertDataListCategory,
@@ -281,7 +291,7 @@ class ManageCategoryComponent extends Component {
                   ])
                 },
                 () => {
-                  // them moi va cap nhat lai
+                  // them moi va cap nhat lai nếu là category root
                   let convertDataListCategory = this._interpolationListCategory(
                     this.state.listSourceCategory,
                     this.state.listRootCategory,
@@ -289,6 +299,7 @@ class ManageCategoryComponent extends Component {
                   );
                   this.setState(
                     {
+                      categoryName: "",
                       addSuccess: true,
                       showSuccessMessage: true,
                       listCategory: convertDataListCategory,
@@ -304,7 +315,7 @@ class ManageCategoryComponent extends Component {
           }
         })
         .catch(errData => {
-          this.setState({addSuccess: false, showSuccessMessage: false});
+          this.setState({ processing: false,addSuccess: false, showSuccessMessage: false });
           ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
           console.log(errData);
         });
@@ -329,6 +340,7 @@ class ManageCategoryComponent extends Component {
                 <input
                   className="input-style"
                   type="text"
+                  defaultValue={this.state.categoryName}
                   onFocus = { () => {this.setState( {showSuccessMessage : false})}}
                   onBlur={categoryName => {
                     this.setState({ categoryName: categoryName.target.value });
@@ -425,6 +437,7 @@ class ManageCategoryComponent extends Component {
                     <div className="width-365px"> Tên Category </div>
                     <div className="div-lever-col-2"> Category ID</div>
                     <div className="div-lever-col-3"> Status </div>
+                    <div className="div-lever-col-4"> Thay đổi </div>
                   </div>
                   {this._renderListCategory(this.state.listCategory)}
                 </div>

@@ -87,6 +87,7 @@
     word-break: break-word;
     margin-top: 20px;
     transition-duration: 0.6;
+    margin-left:  20px;
 }
 .Loadmore-button:hover{
     color: #fff;
@@ -97,4 +98,5 @@
     outline: none;
     color: #fff;
     background-color: #ab0606;
+    box-shadow: none !important;
 }

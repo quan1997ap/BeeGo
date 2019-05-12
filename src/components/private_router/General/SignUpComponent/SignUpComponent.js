@@ -4,7 +4,11 @@ import "./SignUpComponentMore.css";
 import { Button } from "react-bootstrap";
 import { signUpService } from "../../../../service/signup-service";
 import { UseInfoModel } from "../../../../model/userinfo.model";
-
+import {
+  ToastsContainer,
+  ToastsStore,
+  ToastsContainerPosition
+} from "react-toasts";
 import { _validateEmail , _maxLength , _minLength } from "../../../../configs/validates";
 
 class SignUpComponent extends Component {
@@ -54,15 +58,35 @@ class SignUpComponent extends Component {
     signUpService(userInfo).then(resRegister => {
       console.log(resRegister);
       if (resRegister != undefined && resRegister.data.resut == false){
-        this.setState({resMessage : resRegister.data.message }) 
+        ToastsStore.error(resRegister.data.message);
+        this.setState({resMessage : resRegister.data.message }) ;
+        // this.props.history.push({
+        //   pathname: "/login",
+        //   statusRegister : "success"
+        // });
       }
-    });
+      else if(resRegister != undefined && resRegister.data.resut == true){
+        ToastsStore.success("Đăng kí thành công !");
+        this.props.history.push({
+          pathname: "/login",
+          statusRegister : "success"
+        });
+      }
+    }).catch(
+      e=> {
+        ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+      }
+    );
   }
 
 
   render() {
     return (
       <div className="SignIn-component">
+        <ToastsContainer
+          store={ToastsStore}
+          position={ToastsContainerPosition.TOP_RIGHT}
+        />
         <div className="limiter Background-login">
           <div className="container-login100 Background-form-login">
             <div className="wrap-login100 p-l-50 p-r-50 p-t-62 p-b-33 Scaledow-form-login">

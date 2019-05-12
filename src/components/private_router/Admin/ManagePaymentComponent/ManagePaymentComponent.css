@@ -5,6 +5,7 @@
     font-weight: bold;
     margin-bottom: 10px;
     text-align: left;
+    font-size: 16px;
 }
 
 .sub-title {
@@ -19,11 +20,14 @@
 }
 .read-more-button{
     color: #286DA8 !important;
+    cursor: pointer;
 }
 .text-left{
     text-align: left !important;
 }
-
+.phuong-thuc-tt{
+    width: 200px !important;
+}
 /* tab-add-category */
 
 .tab-add-category {

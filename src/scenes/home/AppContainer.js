@@ -20,7 +20,6 @@ import rootReducer from "../../redux/reducers/rootReduces";
 import { Login } from "../../redux/actions/checkAuthorizeAction";
 import { Button } from "react-bootstrap";
 
-// import ProfileComponent from "../../components/private_router/General/ProfileComponent/ProfileComponent";
 import HeaderComponent from "../../components/public_router/HeaderComponent/HeaderComponent";
 import LoginComponent from "../../components/private_router/General/LoginComponent/LoginComponent";
 import SignUpComponent from "../../components/private_router/General/SignUpComponent/SignUpComponent";
@@ -36,8 +35,7 @@ import ManagePaymentComponent from "../../components/private_router/Admin/Manage
 import ManageUserComponent from "../../components/private_router/Admin/ManageUserComponent/ManageUserComponent";
 import NotificationPermissionComponent from "../../components/public_router/NotificationPermissionComponent/NotificationPermissionComponent";
 
-
-
+// import $ from 'jquery';
 // Create store
 const store = createStore(rootReducer);
 
@@ -53,21 +51,22 @@ class AppContainer extends Component {
   }
 
   componentWillMount() {
-    // console.log(store.getState());
+     console.log(store.getState().authenticationInfo);
     window.addEventListener("scroll", this._handleScroll);
     // check token dang nhap
     getStorageService("token").then(token => {
       if (token !== null && token !== "token invalid") {
         ckeckTokenService(token).then(statusToken => {
-          if (statusToken.status === 200) {
-            store.dispatch(Login(true));
+          //console.log(statusToken)
+          if (statusToken.data.status === 'live' ) {
+            store.dispatch(Login({ isLogin: true, role: statusToken.data.role}));
             this.setState({ isAuthenticated: true });
           }
         });
       } else {
-        store.dispatch(Login(false));
+        store.dispatch(Login({ isLogin: false, role: null}));
         this.setState({ isAuthenticated: false }, () => {
-          console.log(this.state.isAuthenticated);
+          //console.log(this.state.isAuthenticated);
         });
       }
     });
@@ -82,12 +81,15 @@ class AppContainer extends Component {
     let wrapRouter = document.getElementById("Wrap-router");
     let searchHeader = document.getElementById("Search-header");
     let headerMenu = document.getElementById("Header-menu");
-    let detailMenu = document.getElementById("Menu-detail");
+    let detailMenu = document.getElementById("Menu-detail") ;  
+
 
     let positionScrollBar = window.scrollY;
     // console.log(positionScrollBar)
     if (positionScrollBar < 45 ) {
-      detailMenu.classList.remove("Display-none");
+      if( detailMenu !== null){
+        detailMenu.classList.remove("Display-none");
+      }
       if (positionScrollBar < 25) {
         wrapRouter.style.marginTop = 0;
         Header.classList.remove("Position-fixed");
@@ -99,14 +101,16 @@ class AppContainer extends Component {
       Header.classList.add("Position-fixed");
       searchHeader.classList.add("Style-search-header");
       headerMenu.classList.add("Style-menu-header");
-      detailMenu.classList.add("Display-none");
+      if( detailMenu !== null){
+        detailMenu.classList.add("Display-none");
+      }
     }
   }
 
   render() {
     return (
       <Provider store={store}>
-        <Router basename={'/beego'} >
+        <Router basename={'/beego/'} >
           <div className="App-container">
             <HeaderComponent />
             {/* chú ý private router => nếu pass props thông thường (auth = {isAuthenticated}) => không nhận dc
@@ -117,16 +121,16 @@ class AppContainer extends Component {
                 <Route path="/signup" exact component={SignUpComponent} />
                 <Route path="/login" exact component={LoginComponent}/>
                 {/* Provider */}
-                <PrivateRoute path="/list-product-of-user"  exact  authed={store.getState().isLogin} component={ListProductOfUserComponent} />                  
+                <PrivateRoute path="/list-product-of-user"  exact  authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter="customer" component={ListProductOfUserComponent} />                  
                
                 {/* Admin */}
-                <PrivateRoute  path="/manage" exact authed={store.getState().isLogin} roleUser = "admin" component={ManageUserComponent} />
-                <PrivateRoute  path="/manage/user-account" exact authed={store.getState().isLogin} roleUser = "admin" component={ManageUserComponent} />
-                <PrivateRoute  path="/manage/category" exact authed={store.getState().isLogin} roleUser = "admin" component={ManageCategoryComponent} />
-                <PrivateRoute  path="/manage/discount" exact authed={store.getState().isLogin} roleUser = "admin" component={ManageDiscountComponent} />
-                <PrivateRoute  path="/manage/payment" exact authed={store.getState().isLogin} roleUser = "admin" component={ManagePaymentComponent} />
-
-
+                <PrivateRoute  path="/manage" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageUserComponent} />
+                <PrivateRoute  path="/manage/user-account" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageUserComponent} />
+                <PrivateRoute  path="/manage/category" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageCategoryComponent} />
+                <PrivateRoute  path="/manage/discount" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageDiscountComponent} />
+                <PrivateRoute  path="/manage/payment" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManagePaymentComponent} />
+               
+                <Route path="/redirect/without-permission" exact component={NotificationPermissionComponent}/>
                 <Route component={NoMatchComponent} />
               </Switch>
             </div>

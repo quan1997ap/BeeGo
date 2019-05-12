@@ -1,3 +1,3 @@
-export function Login(isLogin) {
-    return { type: 'LOGIN', isLogin }
+export function Login(authenticationInfo) {
+    return { type: 'LOGIN', authenticationInfo }
 }

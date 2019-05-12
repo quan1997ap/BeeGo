@@ -33,7 +33,7 @@
 .div-lever {
     border-left: 1px solid;
     font-weight: 600;
-    height: 40px;
+    min-height: 40px;
     border-bottom: 1px solid;
     line-height: 40px;
     padding-left: 10px;
@@ -101,6 +101,7 @@
     font-weight: bold;
     margin-bottom: 10px;
     text-align: left;
+    font-size: 16px;
 }
 
 .sub-title {

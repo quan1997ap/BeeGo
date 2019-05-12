@@ -45,7 +45,10 @@ class LoginComponent extends Component {
       showPass: false,
       componentDidMount: false,
       isFirst: true,
-      from: "/"
+      from: "/",
+
+      registerSuccess : false,
+      tokenExprise: false
     };
   }
 
@@ -56,32 +59,49 @@ class LoginComponent extends Component {
     });
   }
 
-  _dispatchReduxLogin(isLogin) {
-    this.props.dispatchReduxLogin(isLogin);
+  _dispatchReduxLogin(authenticationInfo) {
+    this.props.dispatchReduxLogin(authenticationInfo);
+  }
+
+  componentWillMount(){
+    if(this.props.location.statusRegister != undefined && this.props.location.statusRegister === "success" ){
+      this.setState({registerSuccess : true})
+    }
+    if( this.props.location.tokenExprise != undefined && this.props.location.tokenExprise === "tokenExprise"){
+      this.setState({tokenExprise : true})
+    }
   }
 
   componentDidMount() {
     // lưu pathname của private => đăng nhập xong => chuyển sang
     let token = localStorage.getItem("token");
-    console.log(this.props.location.state);
     if (this.props.location.state !== undefined) {
+      console.log(this.props.location.state.detail.detail);
+      let prePathName = this.props.location.state.detail.detail;
       this.setState({
-        from: { pathname: `${this.props.location.state.detail}` }
+        from: { pathname: prePathName} 
+        // from: { pathname: "/manage/user-account" } 
       });
     } else {
       this.setState({ from: { pathname: "/" } });
     }
 
     if (token !== null && token !== "token invalid") {
+      console.log('vao')
       ckeckTokenService(token).then(statusToken => {
-        if (statusToken.status === 200) {
-          this._dispatchReduxLogin(true);
-          this.setState({ redirectToReferrer: true });
+        console.log(statusToken.data)
+        if (statusToken.data.status === 'live' ) {
+          this._dispatchReduxLogin({ isLogin: true, role: statusToken.data.role});
+          this.setState({ redirectToReferrer: true }, () => {console.log(this.state.redirectToReferrer)});
+        }
+        else if (statusToken.data.status !== 'live'){
+          this.setState({tokenExprise : true});
         }
       });
     } else {
+      console.log('k vao')
+      this._dispatchReduxLogin({ isLogin: false, role: null});
       this.setState({ redirectToReferrer: false });
-      this._dispatchReduxLogin(false);
     }
   }
 
@@ -97,14 +117,15 @@ class LoginComponent extends Component {
       } else if (resLogin.data.result === true) {
         setStorageService("typeUser", userAccount.type);
         setStorageService("token", resLogin.data.token).then(() => {
-          this._dispatchReduxLogin(true);
-          ToastsStore.success("Thêm category thành công");
+          this._dispatchReduxLogin({isLogin: true, role : resLogin.data.role});
+          ToastsStore.success("Đăng nhập thành công !");
           this.setState({ redirectToReferrer: true });
         });
       }
     }).catch(
       (errLogin) => {
         console.log(errLogin);
+        this._dispatchReduxLogin({ isLogin: false, role: null});
         ToastsStore.error("Có lỗi xảy ra, hãy đăng nhập lại !");
       } 
     )
@@ -124,6 +145,8 @@ class LoginComponent extends Component {
           />
           <div className="limiter Background-login">
             <div className="container-login100 Background-form-login">
+            <p className= {"success-register-text " + ( this.state.registerSuccess === true ? "" : "Display-none")}>Bạn vừa đăng kí thành công tài khoản mới, hãy đăng nhập với tài khoản vừa tạo</p>
+            <p className= {"success-register-text " + ( this.state.tokenExprise === true ? "" : "Display-none")}>Phiên đăng nhập của bạn đã kết thúc, vui lòng đăng nhập lại.</p>
               <div className="wrap-login100 p-l-50 p-r-50 p-t-62 p-b-33 Scaledow-form-login">
                 <form className="login100-form validate-form flex-sb flex-w">
                   <span className="login100-form-title p-b-15">Đăng nhập</span>
@@ -296,7 +319,7 @@ const mapStateToProps = state => {
 // isLogin == true => đã login // false => chưa login
 const mapDispatchToProps = dispatch => {
   return {
-    dispatchReduxLogin: isLogin => dispatch(Login(isLogin))
+    dispatchReduxLogin: dispatchReduxLogin => dispatch(Login(dispatchReduxLogin))
   };
 };
 

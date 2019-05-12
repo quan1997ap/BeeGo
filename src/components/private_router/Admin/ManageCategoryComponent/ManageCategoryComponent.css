@@ -15,6 +15,7 @@
 .option-level-4 {
     color: #333333;
 }
+
 .option-level-5 {
     color: #8dbdff;
 }
@@ -24,16 +25,19 @@
 }
 
 /* div */
-.width-365px{
+
+.width-365px {
     width: 365px;
 }
-.display-none{
+
+.display-none {
     display: none !important;
 }
+
 .div-lever {
     border-left: 1px solid;
     font-weight: 600;
-    height: 40px;
+    min-height: 40px;
     border-bottom: 1px solid;
     line-height: 40px;
     padding-left: 10px;
@@ -42,11 +46,17 @@
     flex-direction: row;
 }
 
-.div-lever-col-2{
+.div-lever-col-2 {
     width: 250px;
     padding: 0 15px;
 }
-.div-lever-col-3{
+
+.div-lever-col-3 {
+    width: 100px;
+    padding: 0 15px;
+}
+
+.div-lever-col-4 {
     width: 100px;
     padding: 0 15px;
 }
@@ -91,9 +101,11 @@
     margin-left: 75px;
     color: #8dbdff;
 }
+
 .div-level-5>div:first-child {
     width: 290px;
 }
+
 .title-tab {
     color: #000;
     text-transform: uppercase;
@@ -101,6 +113,7 @@
     font-weight: bold;
     margin-bottom: 10px;
     text-align: left;
+    font-size: 16px;
 }
 
 .sub-title {
@@ -166,7 +179,8 @@
     background: #dc3333;
     float: right;
 }
-.button-add:disabled{
+
+.button-add:disabled {
     opacity: 0.3;
 }
 
@@ -182,14 +196,17 @@
 }
 
 /* modal */
+
 .modal-content {
     position: absolute;
     top: calc(50vh - 150px) !important;
 }
-.position-relative{
+
+.position-relative {
     position: relative;
 }
-.Modal-footer-loadding{
+
+.Modal-footer-loadding {
     width: 100px;
     display: flex;
     flex-direction: row;
@@ -199,7 +216,8 @@
 }
 
 /* Loading */
-.Processing{
+
+.Processing {
     display: flex;
     margin-top: 20px;
     height: 40px;
@@ -209,17 +227,73 @@
     justify-content: left;
     align-items: center;
 }
-.Processing > .spinner {
+
+.Processing>.spinner {
     margin-left: 0px !important;
 }
-.Processing>span{
+
+.Processing>span {
     margin-left: 10px;
 }
 
- /* Response Message */
-.SUCCESS > i , .SUCCESS > span {
+/* Response Message */
+
+.SUCCESS>i, .SUCCESS>span {
     color: #28a745 !important;
 }
-.FAIL > i , .FAIL > span {
+
+.FAIL>i, .FAIL>span {
     color: #ea4242 !important;
+}
+
+/* Edit Button */
+
+.div-edit-del {
+    display: flex;
+}
+
+.edit-button {
+    height: 35px;
+    width: 50px;
+    line-height: 35px;
+    color: #007bff;
+    background: transparent;
+    border: none;
+    padding: 0 0;
+    outline: none;
+}
+
+.edit-button:hover {
+    color: #fff;
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+.edit-button:focus {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.delete-button {
+    height: 35px;
+    width: 50px;
+    line-height: 35px;
+    color: #ea4242;
+    background: transparent;
+    border: none;
+    padding: 0 0;
+    outline: none;
+}
+
+.delete-button:hover {
+    color: #fff;
+    background-color: #ea4242;
+    border-color: #ea4242;
+}
+
+.delete-button:focus {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
