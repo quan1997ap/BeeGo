@@ -16,7 +16,17 @@
 } 
 .List-user{
     margin-top: 60px;
-    padding-bottom: 50px
+    padding-bottom: 50px;
+    position: relative;
+}
+.Select-display{
+    width: 250px;
+    float: right;
+    height: 40px;
+    position: absolute;
+    right: 0px;
+    top: -1px;
+    border: 2px solid #dc3333;
 }
 .nav-tabs .nav-link {
     border: 1px solid transparent;
@@ -97,6 +107,6 @@
     border: none;
     outline: none;
     color: #fff;
-    background-color: #ab0606;
+    background-color: #dc3333;
     box-shadow: none !important;
 }

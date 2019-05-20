@@ -17,8 +17,6 @@ import {
 import _ from "lodash";
 import { getInfoUser } from "../../../../service/login-service";
 import { getStorageService } from "../../../../service/storeage-service";
-import Checkbox from "./component/Checkbox";
-
 
 class ManageUserComponent extends Component {
   constructor(props) {
@@ -27,7 +25,6 @@ class ManageUserComponent extends Component {
       userData: {},
       listProvider: [],
       listCustomer: [],
-      token: "",
       errGetCustomer: "",
       errGetProvider: "",
       showModal: false,
@@ -36,10 +33,11 @@ class ManageUserComponent extends Component {
       isLoading: false,
       currentPageCustomer: 0,
       currentPageProvider: 0,
-      listUserSelected: [],
-      displayBlockCustomerItem: null,
-      displayBlockProviderItem: null,
-      isBlockWithList: null // null = làm việc với user, true = block list user , false unblock list user
+      listUserIDSelected: [],
+      tabSelected: "customer",
+      isBlockWithList: null, // null = làm việc với user, true = block list user , false unblock list user
+      displayType: 'all',
+      selectAllUser: false
     };
   }
 
@@ -58,12 +56,10 @@ class ManageUserComponent extends Component {
   }
 
   componentWillMount() {
-    getStorageService("token").then(token =>
-      getInfoUser(token).then(userData => {
-        this.setState({ userData: userData.data });
-        this._getListUserWithTokenAdmin();
-      })
-    );
+    getInfoUser().then(userData => {
+      this.setState({ userData: userData.data });
+      this._getListUserWithTokenAdmin();
+    });
   }
 
   _replaceItemInArr(UserInfoArr = [], dataItem, typeArr) {
@@ -89,7 +85,8 @@ class ManageUserComponent extends Component {
       userSelected: null,
       showModal: false,
       isBlockWithList: null,
-      isLoading: false
+      isLoading: false,
+      listUserIDSelected: []
     });
   }
 
@@ -111,7 +108,7 @@ class ManageUserComponent extends Component {
                 userSelectedToggleStatus,
                 this.state.userSelected.type
               );
-              this.setState({ showModal: false, isLoading: false }, () => {
+              this.setState({ showModal: false, isLoading: false, selectAllUser: false }, () => {
                 ToastsStore.success("Mở khóa thành công");
                 cancelRequest();
               });
@@ -138,7 +135,7 @@ class ManageUserComponent extends Component {
                 userSelectedToggleStatus,
                 this.state.userSelected.type
               );
-              this.setState({ showModal: false, isLoading: false }, () => {
+              this.setState({ showModal: false, isLoading: false , selectAllUser: false}, () => {
                 ToastsStore.success("Khóa thành công");
                 cancelRequest();
               });
@@ -154,29 +151,67 @@ class ManageUserComponent extends Component {
     }
   }
 
-  _toggleStatusListUser(isBlockWithList) {
-    //this.state.isBlockWithList == true => block list user và ngược lại
-    if (isBlockWithList === true) {
-      blockMultiUserService(this.state.listUserSelected).then(data => {
-        if (data.data.ok === 1) {
-          console.log(data.data.ok);
+  _refreshList(_dataOfTabSelected, status) {
+    // listUserIDSelected: mảng ID được chọn
+    // dataOfTabSelected: mảng data của tab được chọn
+    let dataOfTabSelected = _dataOfTabSelected;
+    this.state.listUserIDSelected.forEach(_IDSelected => {
+      dataOfTabSelected.forEach(user => {
+        if (user._id === _IDSelected) {
+          user.isBlock = status;
         }
-      })
-    } else if (isBlockWithList === false) {
-      console.log('else')
-      unblockMultiUserService(this.state.listUserSelected).then(data => {
-        if (data.data.ok === 1) {
-          console.log(data.data.ok);
-        }
-      })
+      });
+    });
+    if (this.state.tabSelected === "customer") {
+      this.setState({ listCustomer: dataOfTabSelected });
+    } else if (this.state.tabSelected === "provider") {
+      this.setState({ listProvider: dataOfTabSelected });
     }
+  }
+
+  _toggleStatusListUser(isBlockWithList) {
+    this.setState({ isLoading: true }, () => {
+      //this.state.isBlockWithList == true => block list user và ngược lại
+      let dataOfTabSelected =
+        this.state.tabSelected === "customer"
+          ? Object.assign([], this.state.listCustomer)
+          : Object.assign([], this.state.listProvider);
+      if (isBlockWithList === true) {
+        // khóa các user dang chọn
+        blockMultiUserService(this.state.listUserIDSelected).then(data => {
+          if (data.data.ok === 1) {
+            this._refreshList(dataOfTabSelected, true);
+            this.setState(
+              { showModal: false, isLoading: false, listUserIDSelected: [] , selectAllUser: false},
+              () => {
+                ToastsStore.success("Khóa thành công");
+                cancelRequest();
+              }
+            );
+          }
+        });
+      } else if (isBlockWithList === false) {
+        unblockMultiUserService(this.state.listUserIDSelected).then(data => {
+          if (data.data.ok === 1) {
+            this._refreshList(dataOfTabSelected, false);
+            this.setState(
+              { showModal: false, isLoading: false, listUserIDSelected: [] , selectAllUser: false},
+              () => {
+                ToastsStore.success("Mở khóa thành công");
+                cancelRequest();
+              }
+            );
+          }
+        });
+      }
+    });
   }
 
   _handleAcceptModal(isBlockWithList) {
     if (isBlockWithList === null) {
       // mở khóa or khóa 1 user
       this._toggleStatusUser();
-    } else if (isBlockWithList === true || isBlockWithList === false ) {
+    } else if (isBlockWithList === true || isBlockWithList === false) {
       // mở khóa or khóa list user
       this._toggleStatusListUser(isBlockWithList);
     }
@@ -257,18 +292,39 @@ class ManageUserComponent extends Component {
     }
   }
 
-  _setListUserSelected = (_id) => {
-    let listUserSelected = this.state.listUserSelected;
+  _changeDisplayDataTable(event) {
+    let displayType = event.target.value;  
+      switch (displayType) {
+        case "all":
+          this.setState({ displayType: "all" });
+          break;
+        case "unblock":
+          this.setState({ displayType: "unblock" });
+          break;
+        case "block":
+          this.setState({ displayType: "block" });
+          break;
+        default:
+          this.setState({ displayType: "block" });
+          break;
+      }
+      if (this.state.selectAllUser === true){
+        this._selectedAllUser(true);
+      }
+  }
+
+  _setListUserSelected(_id) {
+    let listUserIDSelected = this.state.listUserIDSelected;
     // check, nếu có id trong mảng => hủy check box (remove id khỏi mảng) và ngược lại
     //
     if (this._setDefaultValueCheckbox(_id) === null) {
       // chưa có trong mảng => phải thêm
       this.setState(
         {
-          listUserSelected: listUserSelected.concat([_id])
+          listUserIDSelected: listUserIDSelected.concat([_id])
         },
         () => {
-          console.log(this.state.listUserSelected);
+          //  console.log(this.state.listUserIDSelected);
         }
       );
     } else if (
@@ -276,32 +332,47 @@ class ManageUserComponent extends Component {
       this._setDefaultValueCheckbox(_id) !== undefined
     ) {
       // đã có trong mảng => phải remove
-      var filtered = this.state.listUserSelected.filter(function(value) {
+      var filtered = this.state.listUserIDSelected.filter(function(value) {
         return value !== _id;
       });
       this.setState(
         {
-          listUserSelected: filtered
+          listUserIDSelected: filtered
         },
         () => {
-          console.log(this.state.listUserSelected);
+          //  console.log(this.state.listUserIDSelected);
         }
       );
     }
   }
 
-  selectedAllUser(typeAccount) {
-    if (typeAccount === "customer") {
-      let arrSelected = this.state.listCustomer.map(customer => customer._id);
-      this.setState({
-        listUserSelected: arrSelected
-      });
-    } else if (typeAccount === "customer") {
-      let arrProvider = this.state.listProvider.map(customer => customer._id);
-      this.setState({
-        listUserSelected: arrProvider
-      });
-    }
+  _selectedAllUser(param) {
+    this.setState(
+      {selectAllUser : param === 'noparam' ? !this.state.selectAllUser : param},
+      () => {
+        if (this.state.selectAllUser === true){
+          let currentTabData = this.state.tabSelected === "customer" ? this.state.listCustomer : this.state.listProvider;
+          let selectAllArr = [];
+          if(this.state.displayType === "block"){
+            // isBlock == true
+            selectAllArr = currentTabData.filter(element => element.isBlock === true).map(e => e._id);
+          }
+          else if(this.state.displayType === "unblock"){
+             // isBlock == true
+             selectAllArr = currentTabData.filter(element => element.isBlock === false).map(e => e._id);
+          }
+          else{
+            // all
+            selectAllArr = currentTabData.map(e => e._id);
+          };
+          this.setState({listUserIDSelected : selectAllArr }, () => {console.log(this.state.listUserIDSelected)})
+        }
+        else{
+          console.log('reset')
+          this.setState({listUserIDSelected : []})
+        }
+      }
+    )
   }
 
   _blockListSelectUser() {
@@ -314,12 +385,11 @@ class ManageUserComponent extends Component {
   _setDefaultValueCheckbox(_id) {
     // kiểm tra xem giá trị select có tồn tại trong bảng k
     let checkResult;
-    console.log(this.state.listUserSelected);
-    let listUserSelected = Object.assign([], this.state.listUserSelected);
-    let lengthListUserSelected = listUserSelected.length;
+    let listUserIDSelected = Object.assign([], this.state.listUserIDSelected);
+    let lengthListUserSelected = listUserIDSelected.length;
     if (lengthListUserSelected > 0) {
       for (let i = 0; i < lengthListUserSelected; i++) {
-        if (this.state.listUserSelected[i] === _id) {
+        if (this.state.listUserIDSelected[i] === _id) {
           checkResult = _id;
           break;
         } else {
@@ -334,17 +404,24 @@ class ManageUserComponent extends Component {
 
   _renderListUser(list) {
     const listItems = list.map((item, index) => (
-      <tr key={index}>
+      <tr key={index} 
+        className= {
+          (this.state.displayType === 'block' && item.isBlock === false ? "Display-none " : "" ) +
+          (this.state.displayType === 'unblock' && item.isBlock === true ? "Display-none " : "" )
+        }
+      >
         <td>
           <input
             key={item._id}
-            onChange={() => this._setListUserSelected(item._id)}
+            onChange={this._setListUserSelected.bind(this, item._id)}
             type="checkbox"
-            defaultChecked={
-              this._setDefaultValueCheckbox(item._id) === null ? false : true
+            checked={
+              this._setDefaultValueCheckbox(item._id) === null ||
+              this.state.listUserIDSelected.length === 0
+                ? false
+                : true
             }
           />
-          {/* <Checkbox name={item._id} defaultChecked={this._setDefaultValueCheckbox(item._id) === null ? false : true} onChange={this._setListUserSelected(item._id)} /> */}
         </td>
         <td>{index}</td>
         <td>{item._id}</td>
@@ -356,6 +433,7 @@ class ManageUserComponent extends Component {
             className="fas fa-edit Edit-status-account"
             onClick={this._handleShowModal.bind(this, item, "notselectall")}
           />
+            {/* tk không bị khóa */}
           <i
             className={
               "far fa-check-circle " +
@@ -369,7 +447,6 @@ class ManageUserComponent extends Component {
               (item.isBlock === true ? "Check-Block" : "Display-none")
             }
           />{" "}
-          {/* tk không bị khóa */}
         </td>
       </tr>
     ));
@@ -377,7 +454,14 @@ class ManageUserComponent extends Component {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th />
+            <th>
+              <input
+                key='select-all-item'
+                onChange={() => this._selectedAllUser('noparam')}
+                type="checkbox"
+                checked={this.state.selectAllUser}
+              />
+            </th>
             <th>STT</th>
             <th>ID</th>
             <th>Avata</th>
@@ -392,7 +476,6 @@ class ManageUserComponent extends Component {
   }
 
   render() {
-    console.log('rerender')
     return (
       <div className="Profile-component">
         <Modal
@@ -443,11 +526,29 @@ class ManageUserComponent extends Component {
             <span className="UserName">{this.state.userData.username}</span>
           </p>
           <div className="List-user">
-            <Tabs defaultActiveKey="user" 
-               onClick={e => e.preventDefault()}
-               onSelect={() => { this.setState({listUserSelected : null} , () => {console.log(this.state.listUserSelected)})}}
-               id="uncontrolled-tab-example">
-              <Tab eventKey="user" title="Khách hàng thông thường">
+            <select
+              className="Select-display"
+              onChange={this._changeDisplayDataTable.bind(this)}
+            >
+              <option value="all">Hiển thị toàn bộ</option>
+              <option value="block">Hiển thị user đang block</option>
+              <option value="unblock">Hiển thị user không block</option>
+            </select>
+            <Tabs
+              defaultActiveKey="customer"
+              onClick={e => {
+                e.preventDefault();
+              }}
+              onSelect={tabSelectedName => {
+                this.setState({
+                  listUserIDSelected: [],
+                  selectAllUser: false,
+                  tabSelected: tabSelectedName
+                });
+              }}
+              id="uncontrolled-tab-example"
+            >
+              <Tab eventKey="customer" title="Khách hàng thông thường">
                 {this._renderListUser(this.state.listCustomer)}
                 <Button
                   className="Loadmore-button"

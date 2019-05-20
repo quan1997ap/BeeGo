@@ -179,9 +179,10 @@ class ManageCategoryComponent extends Component {
     return listOption;
   }
 
-  subString(string, minLength,maxLength){
+  // subString(string, minLength,maxLength){
 
-  }
+  // }
+
   _renderListCategory(listCategory) {
     // nội suy để tạo table các category
     let listCategoryDetail;
@@ -193,7 +194,8 @@ class ManageCategoryComponent extends Component {
             key={"level-" + itemCategory._id}
             className={"div-lever div-level-" + itemCategory.level}
           >
-            <div> <ReadMoreReact min={20}  max={100} readMoreText={"xem thêm"} text={itemCategory.name} /> </div>
+            {/* <div> <ReadMoreReact min={20}  max={100} readMoreText={"xem thêm"} text={itemCategory.name} /> </div> */}
+            <div> {itemCategory.name} </div>
             <div className="div-lever-col-2"> {itemCategory._id}</div>
             <div className="div-lever-col-3">
               {" "}

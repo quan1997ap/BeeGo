@@ -14,8 +14,7 @@ export function ckeckTokenService(accessToken){
   return axios.get(`${rootPath}/api/token/status`);
 } 
 
-export function getInfoUser(accessToken){
-  axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}` 
+export function getInfoUser(){
   return axios.get(`${rootPath}/api/token/info`);
 } 
 

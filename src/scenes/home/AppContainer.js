@@ -28,14 +28,21 @@ import HomeComponent from "../../components/public_router/HomeComponent/HomeComp
 import ListProductOfUserComponent from "../../components/private_router/Customer/ListProductOfUserComponent/ListProductOfUserComponent";
 import LoadingComponent from "../../components/public_router/LoadingComponent/LoadingComponent";
 import PrivateRoute from "./PrivateRoute";
+// admin
 import FooterWithRouter from "../../components/public_router/FooterComponent/FooterComponent";
 import ManageCategoryComponent from "../../components/private_router/Admin/ManageCategoryComponent/ManageCategoryComponent";
 import ManageDiscountComponent from "../../components/private_router/Admin/ManageDiscountComponent/ManageDiscountComponent";
 import ManagePaymentComponent from "../../components/private_router/Admin/ManagePaymentComponent/ManagePaymentComponent";
 import ManageUserComponent from "../../components/private_router/Admin/ManageUserComponent/ManageUserComponent";
 import NotificationPermissionComponent from "../../components/public_router/NotificationPermissionComponent/NotificationPermissionComponent";
+// provider
+import ManageProductComponent from "../../components/private_router/Provider/ManageProduct/ManageProduct";
 
-// import $ from 'jquery';
+
+//customer
+
+
+
 // Create store
 const store = createStore(rootReducer);
 
@@ -121,14 +128,16 @@ class AppContainer extends Component {
                 <Route path="/signup" exact component={SignUpComponent} />
                 <Route path="/login" exact component={LoginComponent}/>
                 {/* Provider */}
-                <PrivateRoute path="/list-product-of-user"  exact  authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter="customer" component={ListProductOfUserComponent} />                  
+                <PrivateRoute  path="/provider/manage/product" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "provider" component={ManageProductComponent} />
+                {/* Customer */}
+                <PrivateRoute path="/customer/list-product-of-user"  exact  authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter="customer" component={ListProductOfUserComponent} />                  
                
                 {/* Admin */}
-                <PrivateRoute  path="/manage" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageUserComponent} />
-                <PrivateRoute  path="/manage/user-account" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageUserComponent} />
-                <PrivateRoute  path="/manage/category" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageCategoryComponent} />
-                <PrivateRoute  path="/manage/discount" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageDiscountComponent} />
-                <PrivateRoute  path="/manage/payment" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManagePaymentComponent} />
+                <PrivateRoute  path="/admin/manage" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageUserComponent} />
+                <PrivateRoute  path="/admin/manage/user-account" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageUserComponent} />
+                <PrivateRoute  path="/admin/manage/category" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageCategoryComponent} />
+                <PrivateRoute  path="/admin/manage/discount" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageDiscountComponent} />
+                <PrivateRoute  path="/admin/manage/payment" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManagePaymentComponent} />
                
                 <Route path="/redirect/without-permission" exact component={NotificationPermissionComponent}/>
                 <Route component={NoMatchComponent} />

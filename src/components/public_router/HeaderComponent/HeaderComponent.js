@@ -48,43 +48,37 @@ class HeaderComponent extends Component {
 
   _renderMenu(){
     // console.log(this.props.listState.authenticationInfo)
-    if (this.props.listState.authenticationInfo.isLogin === null || this.props.listState.authenticationInfo.role =="customer"){
+    if (this.props.listState.authenticationInfo.isLogin === null || this.props.listState.authenticationInfo.role ==="customer"){
       return (
         <div ></div>
       )
     }
-    else if (this.props.listState.authenticationInfo.isLogin === true || this.props.listState.authenticationInfo.role ==="admin" ){
+    else if (this.props.listState.authenticationInfo.isLogin === true && this.props.listState.authenticationInfo.role ==="admin" ){
       return (
         <Row className= {"Row-menu " +(this.props.listState.authenticationInfo.role !== "admin" ?  "Display-none" : "")} id = "Menu-detail" >
             <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-left-menu Border-right-menu" >
-                <Link to="/manage/user-account"  style={{ color : this.state.currentPathName === "/manage/user-account" ||  this.state.currentPathName === "/manage"  ? "#fff" : "" }} className={"Child-Link1"} >Quản lý người dùng</Link>
+                <Link to="/admin/manage/user-account"  style={{ color : this.state.currentPathName === "/admin/manage/user-account" ||  this.state.currentPathName === "/admin/manage"  ? "#fff" : "" }} className={"Child-Link1"} >Quản lý người dùng</Link>
             </Col>
             <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
-                <Link to="/manage/category"  style={{ color : this.state.currentPathName === "/manage/category" ? "#fff" : "" }} className="Child-Link1">Quản lý danh mục</Link>
+                <Link to="/admin/manage/category"  style={{ color : this.state.currentPathName === "/admin/manage/category" ? "#fff" : "" }} className="Child-Link1">Quản lý danh mục</Link>
             </Col>
             <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
-                <Link to="/manage/discount"  style={{ color : this.state.currentPathName === "/manage/discount" ? "#fff" : "" }} className="Child-Link1">Quản lý mã giảm giá</Link>
+                <Link to="/admin/manage/discount"  style={{ color : this.state.currentPathName === "/admin/manage/discount" ? "#fff" : "" }} className="Child-Link1">Quản lý mã giảm giá</Link>
             </Col>
             <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
-                <Link to="/manage/payment"  style={{ color : this.state.currentPathName === "/manage/payment" ? "#fff" : "" }} className="Child-Link1">Quản lý phương thức thanh toán</Link>
+                <Link to="/admin/manage/payment"  style={{ color : this.state.currentPathName === "/admin/manage/payment" ? "#fff" : "" }} className="Child-Link1">Quản lý phương thức thanh toán</Link>
             </Col>
         </Row>
       )
     }
-    else if (this.props.listState.authenticationInfo.isLogin === true || this.props.listState.authenticationInfo.role ==="customer" ){
-     return(
+    else if (this.props.listState.authenticationInfo.isLogin === true && this.props.listState.authenticationInfo.role ==="provider" ){
+      return(
       <Row className= {"Row-menu " + (this.props.listState.authenticationInfo.role !== "provider" ?  "Display-none" : "")} id = "Menu-detail" >
         <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-left-menu Border-right-menu" >
-            <Link to="/manage/user-account"  style={{ color : this.state.currentPathName === "/manage/user-account" ||  this.state.currentPathName === "/manage"  ? "#fff" : "" }} className={"Child-Link1"} >Quản lý người dùng</Link>
+            <Link to="/provider/manage/product"  style={{ color : this.state.currentPathName === "provider/manage/product" ? "#fff" : "" }} className={"Child-Link1"} >Quản lý sản phẩm</Link>
         </Col>
         <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
-            <Link to="/manage/category"  style={{ color : this.state.currentPathName === "/manage/category" ? "#fff" : "" }} className="Child-Link1">Quản lý danh mục</Link>
-        </Col>
-        <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
-            <Link to="/manage/discount"  style={{ color : this.state.currentPathName === "/manage/discount" ? "#fff" : "" }} className="Child-Link1">Quản lý mã giảm giá</Link>
-        </Col>
-        <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
-            <Link to="/manage/payment"  style={{ color : this.state.currentPathName === "/manage/payment" ? "#fff" : "" }} className="Child-Link1">Quản lý phương thức thanh toán</Link>
+            <Link to="/admin/manage/category"  style={{ color : this.state.currentPathName === "/manage/category" ? "#fff" : "" }} className="Child-Link1">Quản lý danh mục</Link>
         </Col>
     </Row>
      )
@@ -93,7 +87,7 @@ class HeaderComponent extends Component {
 
   componentDidMount(){
     // console.log(this.props.location.pathname);
-     console.log(this.props.listState.authenticationInfo.role !== "admin");
+     console.log(this.props.listState.authenticationInfo.role);
     this.setState({currentPathName : this.props.location.pathname}) ;
   }
   render() {

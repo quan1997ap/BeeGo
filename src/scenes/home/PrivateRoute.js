@@ -23,12 +23,14 @@ class _PrivateRoute extends Component {
   checkAcces = () => {
     const { history, authed, roleRouter , currentRole} = this.props;
     let tokenInLocalStorage = localStorage.getItem("token");
+    console.log(currentRole,roleRouter);
     // ĐÃ ĐĂNG NHẬP VÀ CÓ TOKEN
     if (authed === true && currentRole === roleRouter ) {
       this.setState({ loaded: true, haveAcces: true });
     } else {
       ckeckTokenService(tokenInLocalStorage)
         .then(resCheckToken => {
+          console.log(resCheckToken);
           if (
             roleRouter === resCheckToken.data.role &&
             "live" === resCheckToken.data.status

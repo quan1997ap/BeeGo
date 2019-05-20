@@ -135,6 +135,11 @@ textarea:focus, input:focus {
   font-size: 20px;
   margin-top: 35px;
 }
+.btn-primary.disabled, .btn-primary:disabled {
+  color: #fff;
+  background-color: #dc3333 !important;
+  border-color: #dc3333 !important;
+}
 input:focus::-webkit-input-placeholder { color:transparent; }
 input:focus:-moz-placeholder { color:transparent; }
 input:focus::-moz-placeholder { color:transparent; }

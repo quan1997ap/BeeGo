@@ -46,9 +46,9 @@ class LoginComponent extends Component {
       componentDidMount: false,
       isFirst: true,
       from: "/",
-
       registerSuccess : false,
-      tokenExprise: false
+      tokenExprise: false,
+      isLoading: false
     };
   }
 
@@ -76,30 +76,26 @@ class LoginComponent extends Component {
     // lưu pathname của private => đăng nhập xong => chuyển sang
     let token = localStorage.getItem("token");
     if (this.props.location.state !== undefined) {
-      console.log(this.props.location.state.detail.detail);
       let prePathName = this.props.location.state.detail.detail;
       this.setState({
         from: { pathname: prePathName} 
-        // from: { pathname: "/manage/user-account" } 
       });
     } else {
       this.setState({ from: { pathname: "/" } });
     }
 
     if (token !== null && token !== "token invalid") {
-      console.log('vao')
       ckeckTokenService(token).then(statusToken => {
         console.log(statusToken.data)
         if (statusToken.data.status === 'live' ) {
           this._dispatchReduxLogin({ isLogin: true, role: statusToken.data.role});
-          this.setState({ redirectToReferrer: true }, () => {console.log(this.state.redirectToReferrer)});
+          this.setState({ redirectToReferrer: true, isLoading: false }, () => {console.log(this.state.redirectToReferrer)});
         }
         else if (statusToken.data.status !== 'live'){
           this.setState({tokenExprise : true});
         }
       });
     } else {
-      console.log('k vao')
       this._dispatchReduxLogin({ isLogin: false, role: null});
       this.setState({ redirectToReferrer: false });
     }
@@ -110,25 +106,28 @@ class LoginComponent extends Component {
     userAccount.password = pass;
     userAccount.type = type;
     userAccount.email = email;
-    loginService(userAccount).then(resLogin => {
-      console.log(resLogin);
-      if (resLogin !== undefined && resLogin.data.result === false) {
-        this.setState({ resMessage: resLogin.data.message });
-      } else if (resLogin.data.result === true) {
-        setStorageService("typeUser", userAccount.type);
-        setStorageService("token", resLogin.data.token).then(() => {
-          this._dispatchReduxLogin({isLogin: true, role : resLogin.data.role});
-          ToastsStore.success("Đăng nhập thành công !");
-          this.setState({ redirectToReferrer: true });
-        });
-      }
-    }).catch(
-      (errLogin) => {
-        console.log(errLogin);
-        this._dispatchReduxLogin({ isLogin: false, role: null});
-        ToastsStore.error("Có lỗi xảy ra, hãy đăng nhập lại !");
-      } 
-    )
+    this.setState({isLoading: true}, () => {
+      loginService(userAccount).then(resLogin => {
+        console.log(resLogin);
+        if (resLogin !== undefined && resLogin.data.result === false) {
+          this.setState({ resMessage: resLogin.data.message, isLogin: false, role: null, isLoading: false   });
+
+        } else if (resLogin.data.result === true) {
+          setStorageService("typeUser", userAccount.type);
+          setStorageService("token", resLogin.data.token).then(() => {
+            this._dispatchReduxLogin({isLogin: true, role : resLogin.data.role});
+            ToastsStore.success("Đăng nhập thành công !");
+            this.setState({ redirectToReferrer: true, isLoading: false });
+          });
+        }
+      }).catch(
+        (errLogin) => {
+          console.log(errLogin);
+          this._dispatchReduxLogin({ isLogin: false, role: null, isLoading: false  });
+          ToastsStore.error("Có lỗi xảy ra, hãy đăng nhập lại !");
+        } 
+      )
+    });
   }
 
   render() {
@@ -289,6 +288,7 @@ class LoginComponent extends Component {
                           : "btn-type-user-login-form-valid")
                       }
                       disabled={
+                        this.state.isLoading ===  true ||
                         this.state.password === "" ||
                         this.state.email === "" ||
                         _validateEmail(this.state.email) === false
@@ -296,7 +296,7 @@ class LoginComponent extends Component {
                           : false
                       }
                     >
-                      Đăng nhập
+                       { this.state.isLoading !== true ? <span>Đăng nhập</span> : <span> Loading ...</span>} 
                     </Button>
                     <span className="focus-input100" />
                   </div>
