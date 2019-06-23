@@ -112,6 +112,12 @@
 .Feature-tag-search{
     height: 22px;
 }
+.search-link:hover{
+    color: #fdfdfd;
+}
+.search-link{
+    color: white;
+}
 .Feature-tag-search > a{
     color: #707070;
     -webkit-transition: color ease 0.3s;
@@ -274,8 +280,8 @@
     font-weight: bold;
     word-break: break-word;
 }
-.Button-search:hover {
-    color: #fff;
+.Button-search:hover, .Button-search:focus {
+    color: #fff !important;
     background-color: #dc3333 !important;
     border-color: #dc3333 !important;
 }
@@ -302,6 +308,7 @@
     word-break: break-word;
     box-sizing: border-box;
     padding-top: 40px;
+    cursor: pointer;
 }
 .Account-info::before{
     content: url(../../../assets//image/icon/account.png);

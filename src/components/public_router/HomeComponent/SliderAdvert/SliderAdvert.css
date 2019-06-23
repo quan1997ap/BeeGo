@@ -12,7 +12,7 @@
   width: 100%;
   display: inline-block;
   position: relative;
-  background: red;
+  background: #fdfdfd;
   height: 350px;
   left: 0;
 }
@@ -25,6 +25,7 @@
   text-align: left;
   font-size: 16px;
   padding-left: 15px;
+  padding-top: 20px;
 }
 
 /* custom slider arrow */
@@ -67,7 +68,7 @@
   font-size: 20px;
   line-height: 1;
   opacity: .75;
-  color: #6d6464;
+  color: #dc3333;
 }
 
 /* advert-right */

@@ -40,8 +40,8 @@
 }
 
 .btn-type-user-login:hover{
-  background-color: #ff4343;
-  border: none;
+  background-color: #ff4343 !important;
+  color:  #fff !important;
 }
 .Switch-type-user{
   display: flex !important;

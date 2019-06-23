@@ -48,6 +48,7 @@ class _NotificationPermissionComponent extends Component {
       )
     }
     else if(this.props.listState.authenticationInfo.isLogin === false ){
+      // chưa login 
       return(
         <div className="Container-custom">
           <br/>
@@ -59,6 +60,7 @@ class _NotificationPermissionComponent extends Component {
       )
     }
     else{
+      // các lỗi khác
       return(
         <div className="Container-custom">
           <br/>

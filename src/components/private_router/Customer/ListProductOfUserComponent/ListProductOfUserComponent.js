@@ -15,8 +15,10 @@ class ListProductOfUserComponent extends Component {
 
   render() {
     return(
-      <div>
-        list-product-of-user
+      <div className="container-custom">
+          <div className="user-card">
+              <p className = "cart-name">GIỎ HÀNG CỦA BẠN</p>
+          </div>
       </div>
     )
    

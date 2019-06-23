@@ -26,8 +26,8 @@ import SignUpComponent from "../../components/private_router/General/SignUpCompo
 import NoMatchComponent from "../../components/public_router/NoMatchComponent/NoMatchComponent";
 import HomeComponent from "../../components/public_router/HomeComponent/HomeComponent";
 import ListProductOfUserComponent from "../../components/private_router/Customer/ListProductOfUserComponent/ListProductOfUserComponent";
-import LoadingComponent from "../../components/public_router/LoadingComponent/LoadingComponent";
 import PrivateRoute from "./PrivateRoute";
+import SearchComponent from "../../components/public_router/SearchComponent/SearchComponent";
 // admin
 import FooterWithRouter from "../../components/public_router/FooterComponent/FooterComponent";
 import ManageCategoryComponent from "../../components/private_router/Admin/ManageCategoryComponent/ManageCategoryComponent";
@@ -40,8 +40,7 @@ import ManageProductComponent from "../../components/private_router/Provider/Man
 
 
 //customer
-
-
+import ProfileComponent from "../../components/public_router/ProfileComponent/ProfileComponent";
 
 // Create store
 const store = createStore(rootReducer);
@@ -127,10 +126,15 @@ class AppContainer extends Component {
                 <Route history={createBrowserHistory} path="/" exact component={HomeComponent} />
                 <Route path="/signup" exact component={SignUpComponent} />
                 <Route path="/login" exact component={LoginComponent}/>
+                <Route path="/search" exact component={SearchComponent}/>
+
                 {/* Provider */}
+                <PrivateRoute  path="/provider/manage/" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "provider" component={ManageProductComponent} />
                 <PrivateRoute  path="/provider/manage/product" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "provider" component={ManageProductComponent} />
+                
                 {/* Customer */}
-                <PrivateRoute path="/customer/list-product-of-user"  exact  authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter="customer" component={ListProductOfUserComponent} />                  
+                <PrivateRoute path="/customer/list-product-of-user"  exact  authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter="customer" component={ListProductOfUserComponent} />        
+                  <PrivateRoute path="/customer/profile"  exact  authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter="customer" component={ProfileComponent} />                            
                
                 {/* Admin */}
                 <PrivateRoute  path="/admin/manage" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "admin" component={ManageUserComponent} />
@@ -152,5 +156,4 @@ class AppContainer extends Component {
 }
 
 export default AppContainer;
-//Router https://www.sitepoint.com/react-router-v4-complete-guide/
-// 1337x.to
+

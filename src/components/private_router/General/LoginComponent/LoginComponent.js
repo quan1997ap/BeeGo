@@ -175,8 +175,8 @@ class LoginComponent extends Component {
                     <div
                       className={
                         "Input-invalid " +
-                        (this.state.emailInputLostFocus === true &&
-                        this.state.emailInputFocus === true &&
+                        (this.state.emailInputFocus === true &&
+                        this.state.emailInputLostFocus === true &&
                         _validateEmail(this.state.email) === false
                           ? "Display-block"
                           : "Display-none")

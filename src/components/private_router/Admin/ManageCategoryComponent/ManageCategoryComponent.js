@@ -88,7 +88,7 @@ class ManageCategoryComponent extends Component {
     axios
       .all([
         getListCategoryWithPermision("all", 0, 350),
-        getListCategoryWithPermision("root", 0, 350)
+        getListCategoryWithPermision("null", 0, 350)
       ])
       .then(arrListCategory => {
         this.setState({
@@ -362,7 +362,7 @@ class ManageCategoryComponent extends Component {
                   {this.state.listCategory.length > 0 ? (
                     this._renderSelectCategory(this.state.listCategory)
                   ) : (
-                    <option>Lỗi load data</option>
+                    <option className="text-danger">Lỗi load data</option>
                   )}
                 </select>
                 <p className="note-select">

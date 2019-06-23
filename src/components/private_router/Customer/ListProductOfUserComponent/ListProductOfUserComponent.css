@@ -1,0 +1,9 @@
+.user-card{
+    padding: 30px;
+}
+.cart-name{
+    color: #dc3333;
+    font-weight: bold;
+    text-align: left;
+    font-size: 20px;
+}

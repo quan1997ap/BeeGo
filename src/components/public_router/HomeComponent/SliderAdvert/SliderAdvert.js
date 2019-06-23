@@ -13,25 +13,21 @@ export class SliderAdvert extends React.Component {
     };
     return (
       <div className="full-width">
-        <p className="title-slider-category">Danh mục sản phẩm</p>
+        {/* <p className="title-slider-category">Danh mục sản phẩm</p> */}
+        <br/>
         <Row className="no-margin">
-          <Col xs={12} sm={12} md={8} lg={8} className="no-padding">
+          <Col xs={12} sm={12} md={12} lg={12} className="no-padding">
             <Slider {...settings}>
               <div className="cartItem">
-                1
+                <img src={require("../../../../assets/image/advert1.jpg")} />
               </div>
               <div className="cartItem">
-               2
+                <img src={require("../../../../assets/image/advert2.jpg")} />
+              </div>
+              <div className="cartItem">
+                <img src={require("../../../../assets/image/advert2.jpg")} />
               </div>
             </Slider>
-          </Col>
-          <Col xs={12} sm={12} md={4} lg={4} className="no-padding advert-right">
-            <div className="advert-child">
-                1
-            </div>
-            <div className="advert-child">
-                1
-            </div>
           </Col>
         </Row>
       </div>

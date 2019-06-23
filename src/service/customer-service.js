@@ -7,28 +7,26 @@ let cancel;
 
 // manage Product
 
-export function getAllProductOfCustomer(){
-  return http.get(`${rootPath}/api/provider/product/list`,{
+export function getAllCategoryHomePage(){
+  return http.get(`${rootPath}/api/category/list`,{
     cancelToken: new CancelToken(function executor(c) {
       cancel = c;
     })
   });
 } 
 
-
-export function addNewProduct(newProduct){
-  return http.post(`${rootPath}/api/provider/product/add`,newProduct ,{
+export function getProductByCategoryId(categoryID){
+  return http.get(`${rootPath}/api/product/list?sort=&category=${categoryID}`,{
     cancelToken: new CancelToken(function executor(c) {
       cancel = c;
     })
   });
 } 
 
-// cancel Request
-export default function cancelRequest() {
-  cancel();
-}
-
-
-// an 5cc6a0d61ec84a233589994f
-// gia dung 5cc5c125816c137d55a9428a
+export function getCart(){
+  return http.get(`${rootPath}/api/customer/cart`,{
+    cancelToken: new CancelToken(function executor(c) {
+      cancel = c;
+    })
+  });
+} 

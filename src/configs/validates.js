@@ -5,10 +5,15 @@ export const Regex = {
     phoneRegex: /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/,
     nameCharacters: 4,
     phoneNumberCharacters: 8,
+    numberDecimalRegex: /^\d+$/
 }
 
 export function _validateEmail(email) {
   return Regex.emailRegex.test(email);
+}
+
+export function _validateNumber(number) {
+  return Regex.numberDecimalRegex.test(number);
 }
 
 export function _validatePhone(phone) {

@@ -15,8 +15,10 @@ import axios from "axios";
 import ReadMoreReact from "read-more-react";
 import {
   addNewProduct,
-  getAllProductOfCustomer
-} from "../../../../service/customer-service";
+  getAllProductOfProvider,
+  editProduct
+} from "../../../../service/provider-service";
+import { _validateNumber } from "../../../../configs/validates";
 
 class ManageProductComponent extends Component {
   constructor(props) {
@@ -27,18 +29,35 @@ class ManageProductComponent extends Component {
       listSourceCategory: [],
       listRootCategory: [],
       processing: false,
-      addText: "Thêm mới",
       addSuccess: false,
       showSuccessMessage: false,
 
+      // add new
       listProduct: [],
       productName: "",
-      productCost: "",
+      productPrice: "",
       productDescription: "",
       categoryID: "",
-      isShowProduct: true,
+      isDiscountProduct: false,
+      discountNumber: "",
       maxProductOrder: "",
-      quantityProduct: ""
+      quantityProduct: "",
+
+      // edit
+      isEditProduct: false,
+      leftButtonText: "Thêm mới",
+      oldProduct: {},
+
+      // validate form
+      inputPriceFocus: false,
+      inputMaxOrderFocus: false,
+      inputQuantityOrderFocus: false,
+      inputDiscountOrderFocus: false,
+
+      inputPriceLostFocus: false,
+      inputMaxOrderLostFocus: false,
+      inputQuantityOrderLostFocus: false,
+      inputDiscountOrderLostFocus: false
     };
   }
 
@@ -48,11 +67,8 @@ class ManageProductComponent extends Component {
   }
 
   _getListProductForCustomer() {
-    getAllProductOfCustomer().then(resListProduct => {
-      console.log(resListProduct);
-      this.setState({ listProduct: resListProduct.data }, () => {
-        console.log(this.state.listProduct);
-      });
+    getAllProductOfProvider().then(resListProduct => {
+      this.setState({ listProduct: resListProduct.data });
     });
   }
 
@@ -97,7 +113,7 @@ class ManageProductComponent extends Component {
     axios
       .all([
         getListCategoryWithPermision("all", 0, 350),
-        getListCategoryWithPermision("root", 0, 350)
+        getListCategoryWithPermision("null", 0, 350)
       ])
       .then(arrListCategory => {
         this.setState({
@@ -190,20 +206,35 @@ class ManageProductComponent extends Component {
 
   _renderListProduct(listProduct) {
     let listProductDetail;
-    listProductDetail = listProduct.map((product, index) => (
-      // chèn thêm 1 dấu cách vào trước option
-      <tr key={"level-" + product._id}>
-       <td>{product.name} </td>
-        <td>{product.description} </td>
-        <td>{product.price}</td>
-        <td>{product.quantity}</td>
-        <td>{product.maxOrder}</td>
-        <td>
-          <Button className="edit-button">Edit</Button>
-          <Button className="delete-button">Del</Button>
-        </td>
-      </tr>
-    ));
+    listProductDetail = listProduct.map((product, index) => {
+      if (product.isShow == true) {
+        return (
+          // chèn thêm 1 dấu cách vào trước option
+          <tr key={"level-" + product._id}>
+            <td>{product.name} </td>
+            <td>{product.description} </td>
+            <td>{product.price}</td>
+            <td>{product.quantity}</td>
+            <td>{product.maxOrder}</td>
+            <td>{product.sale}</td>
+            <td>
+              <Button
+                className="edit-button"
+                onClick={this._openEditProduct.bind(this, product)}
+              >
+                Edit
+              </Button>
+              <Button
+                className="delete-button"
+                onClick={this._deleteProduct.bind(this, product)}
+              >
+                Del
+              </Button>
+            </td>
+          </tr>
+        );
+      }
+    });
 
     return listProductDetail;
   }
@@ -212,7 +243,7 @@ class ManageProductComponent extends Component {
     let validateErr = "";
     if (
       this.state.productName === "" ||
-      this.state.productCost === "" ||
+      this.state.productPrice === "" ||
       this.state.quantityProduct === "" ||
       this.state.maxProductOrder === "" ||
       this.state.quantityProduct === ""
@@ -221,36 +252,27 @@ class ManageProductComponent extends Component {
     }
   }
   _addNewProduct() {
-    // console.log(this.state.productName, this.state.productCost, this.state.productDescription, this.state.quantityProduct,this.state.maxProductOrder, this.state.categoryID)
-    let newProduct = new ProductInfoModel(
-      this.state.productName,
-      this.state.productCost,
-      this.state.productDescription,
-      this.state.maxProductOrder,
-      this.state.quantityProduct,
-      this.state.categoryID,
-      false,
-      true
-    );
     this.setState({ processing: true, showSuccessMessage: false }, () => {
       let newProduct = new ProductInfoModel(
         this.state.productName,
-        this.state.productCost,
+        this.state.productPrice,
         this.state.productDescription,
         this.state.maxProductOrder,
         this.state.quantityProduct,
         this.state.categoryID,
-        false,
-        true
+        true,
+        this.state.isDiscountProduct,
+        this.state.discountNumber
       );
-
+        console.log(newProduct);
       addNewProduct(newProduct)
         .then(resNewsProduct => {
+          console.log(resNewsProduct);
           if (resNewsProduct.data.message === "Add Product success") {
             this.setState(
               {
                 productName: "",
-                productCost: "",
+                productPrice: "",
                 productDescription: "",
                 maxProductOrder: "",
                 quantityProduct: "",
@@ -260,9 +282,11 @@ class ManageProductComponent extends Component {
               },
               () => {
                 let listProduct = this.state.listProduct;
-                let newListProduct = listProduct.concat([resNewsProduct.data.data]);
-                this.setState( {listProduct : newListProduct});
-                ToastsStore.success("Thêm category thành công");
+                let newListProduct = listProduct.concat([
+                  resNewsProduct.data.data
+                ]);
+                this.setState({ listProduct: newListProduct });
+                ToastsStore.success("Thêm sản phẩm thành công");
               }
             );
           }
@@ -278,6 +302,127 @@ class ManageProductComponent extends Component {
         });
     });
   }
+  _closeEdit() {
+    this.setState({
+      isEditProduct: false,
+      productName: "",
+      productPrice: "",
+      productDescription: "",
+      quantityProduct: "",
+      maxProductOrder: "",
+      categoryID: "",
+      isDiscountProduct: false,
+      discountNumber: 0,
+      showSuccessMessage: false,
+      processing: false,
+      oldProduct: {}
+    });
+  }
+
+  _openEditProduct(oldProduct) {
+    this.setState({
+      isEditProduct: true,
+      productName: oldProduct.name,
+      productPrice: oldProduct.price,
+      productDescription: oldProduct.description,
+      quantityProduct: oldProduct.quantity,
+      maxProductOrder: oldProduct.maxOrder,
+      categoryID: oldProduct.categoryId._id,
+      isDiscountProduct: oldProduct.isSale,
+      discountNumber: oldProduct.sale,
+      showSuccessMessage: false,
+      processing: false,
+      oldProduct: oldProduct
+    });
+  }
+
+  _editProduct() {
+    let productEdited = Object.assign({}, this.state.oldProduct);
+    productEdited.name = this.state.productName;
+    productEdited.price = this.state.productPrice;
+    productEdited.description = this.state.productDescription;
+    productEdited.maxOrder = this.state.maxProductOrder;
+    productEdited.quantity = this.state.quantityProduct;
+    productEdited.categoryId = this.state.categoryID;
+    productEdited.isSale = this.state.isDiscountProduct;
+    productEdited.sale = this.state.discountNumber;
+
+    this.setState({ processing: true, showSuccessMessage: false }, () => {
+      editProduct(productEdited._id, productEdited, "edit")
+        .then(productUpdate => {
+          if (productUpdate.data.data.ok === 1) {
+            let listProduct = Object.assign([], this.state.listProduct);
+            listProduct.forEach((product, index) => {
+              if (productEdited._id === product._id) {
+                listProduct[index] = productEdited;
+              }
+            });
+            this.setState(
+              {
+                listProduct: listProduct,
+                isEditProduct: false,
+                productName: "",
+                productPrice: "",
+                productDescription: "",
+                quantityProduct: "",
+                maxProductOrder: "",
+                categoryID: "",
+                processing: false
+              },
+              () => {
+                ToastsStore.success("Thêm category thành công");
+              }
+            );
+          } else {
+            ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+        });
+    });
+  }
+
+  _deleteProduct(productDel) {
+    let productEdited = Object.assign({}, productDel);
+
+    this.setState({ processing: true, showSuccessMessage: false }, () => {
+      editProduct(productEdited._id, productEdited, "delete")
+        .then(productDelete => {
+          if (productDelete.data.data.ok === 1) {
+            let listProduct = Object.assign([], this.state.listProduct);
+            listProduct.forEach((product, index) => {
+              if (productEdited._id === product._id) {
+                listProduct.splice(index, 1);
+              }
+            });
+            this.setState(
+              {
+                listProduct: listProduct,
+                isEditProduct: false,
+                productName: "",
+                productPrice: "",
+                productDescription: "",
+                quantityProduct: "",
+                maxProductOrder: "",
+                categoryID: "",
+                processing: false
+              },
+              () => {
+                ToastsStore.success("Xóa sản phẩm thành công");
+              }
+            );
+          } else {
+            ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+        });
+    });
+  }
 
   render() {
     return (
@@ -288,10 +433,40 @@ class ManageProductComponent extends Component {
         />
 
         <div className="container-login100 Profile">
-          <Row>
-            <Col xs={12} sm={4} md={4} lg={3} className="col-padding-top">
+          <Row className="d-flex">
+            <Col
+              xs={12}
+              sm={4}
+              md={4}
+              lg={3}
+              className={
+                "col-padding-top " +
+                (this.state.isEditProduct === true
+                  ? "edit-product-col-left"
+                  : "")
+              }
+            >
               <div className="tab-add-category">
-                <p className="title-tab">Thêm mới SẢN PHẨM</p>
+                <p
+                  className={
+                    "title-tab position-relative " +
+                    (this.state.isEditProduct ? "title-tab-edit" : "")
+                  }
+                >
+                  {this.state.isEditProduct == true
+                    ? "SỬA SẢN PHẨM"
+                    : "THÊM MỚI SẢN PHẨM"}
+                  <Button
+                    className={
+                      this.state.isEditProduct === true
+                        ? "button-exit"
+                        : "display-none"
+                    }
+                    onClick={this._closeEdit.bind(this)}
+                  >
+                    <i className="fas fa-times" />
+                  </Button>
+                </p>
                 <p className="sub-title"> Tên sản phẩm</p>
                 <input
                   className="input-style"
@@ -311,19 +486,39 @@ class ManageProductComponent extends Component {
                   Giá sản phẩm{" "}
                   <span className="text-primary">( vd: 10000đ )</span>
                 </p>
+
                 <input
                   className="input-style input-style-currence"
                   type="text"
                   placeholder="đ"
-                  value={this.state.productCost}
+                  value={this.state.productPrice}
                   onFocus={() => {
-                    this.setState({ showSuccessMessage: false });
+                    this.setState({
+                      showSuccessMessage: false,
+                      inputPriceFocus: true
+                    });
                   }}
-                  onChange={productCost => {
-                    this.setState({ productCost: productCost.target.value });
+                  onBlur={() => {
+                    this.setState({ inputPriceLostFocus: true });
+                  }}
+                  onChange={productPrice => {
+                    this.setState({ productPrice: productPrice.target.value });
                   }}
                   name="category-name"
                 />
+                <div
+                  className={
+                    "text-danger " +
+                    (this.state.inputPriceFocus === true &&
+                    this.state.inputPriceLostFocus === true &&
+                    _validateNumber(this.state.productPrice) === false
+                      ? "Display-block"
+                      : "Display-none")
+                  }
+                >
+                  Bạn phải nhập đúng định dạng tiền
+                </div>
+
                 {/* Mô tả sản phẩm */}
                 <p className="sub-title"> Mô tả sản phẩm</p>
 
@@ -350,13 +545,31 @@ class ManageProductComponent extends Component {
                   type="text"
                   value={this.state.maxProductOrder}
                   onFocus={() => {
-                    this.setState({ showSuccessMessage: false });
+                    this.setState({
+                      showSuccessMessage: false,
+                      inputMaxOrderFocus: true
+                    });
+                  }}
+                  onBlur={() => {
+                    this.setState({ inputMaxOrderLostFocus: true });
                   }}
                   onChange={maxOrder => {
                     this.setState({ maxProductOrder: maxOrder.target.value });
                   }}
                   name="category-name"
                 />
+                <div
+                  className={
+                    "text-danger " +
+                    (this.state.inputMaxOrderLostFocus === true &&
+                    this.state.inputMaxOrderFocus === true &&
+                    _validateNumber(this.state.maxProductOrder) === false
+                      ? "Display-block"
+                      : "Display-none")
+                  }
+                >
+                  Bạn phải nhập đúng định dạng số
+                </div>
 
                 <p className="sub-title"> Số sản phẩm bán</p>
                 <input
@@ -364,20 +577,38 @@ class ManageProductComponent extends Component {
                   type="text"
                   value={this.state.quantityProduct}
                   onFocus={() => {
-                    this.setState({ showSuccessMessage: false });
+                    this.setState({
+                      showSuccessMessage: false,
+                      inputQuantityOrderFocus: true
+                    });
+                  }}
+                  onBlur={() => {
+                    this.setState({ inputQuantityOrderLostFocus: true });
                   }}
                   onChange={slProduct => {
                     this.setState({ quantityProduct: slProduct.target.value });
                   }}
                   name="category-name"
                 />
+                <div
+                  className={
+                    "text-danger " +
+                    (this.state.inputQuantityOrderLostFocus === true &&
+                    this.state.inputQuantityOrderFocus === true &&
+                    _validateNumber(this.state.quantityProduct) === false
+                      ? "Display-block"
+                      : "Display-none")
+                  }
+                >
+                  Bạn phải nhập đúng định dạng só
+                </div>
 
                 <p className="sub-title"> Category cha</p>
                 <select
+                  value={this.state.categoryID}
                   className="input-style"
                   onChange={parentId =>
                     this.setState({
-                      parentCategoryID: parentId.target.value,
                       categoryID: parentId.target.value
                     })
                   }
@@ -394,24 +625,54 @@ class ManageProductComponent extends Component {
                 {/* <p className="note-select">
                   Không có: Sản phẩm không thuộc Category nào.
                 </p> */}
-                <p className="sub-title">Trạng thái sản phẩm</p>
+                <p className="sub-title" />
                 <div className="check-isShow">
                   <input
-                    name="isShowProduct"
+                    name="isDiscountProduct"
                     type="checkbox"
-                    checked={this.state.isShowProduct}
+                    checked={this.state.isDiscountProduct}
                     onChange={() =>
-                      this.setState(
-                        {
-                          isShowProduct: !this.state.isShowProduct
-                        },
-                        () => {
-                          // console.log(this.state.isShowProduct);
-                        }
-                      )
+                      this.setState({
+                        isDiscountProduct: !this.state.isDiscountProduct
+                      })
                     }
                   />
-                  <span>Cho phép người dùng có thể nhìn thấy sản phẩm</span>
+                  <span>Có giảm giá</span>
+                  <div className= { "discount " + (this.state.isDiscountProduct == true ? "": "display-none")}>
+                    <input
+                      className="input-style input-discount"
+                      type="text"
+                      value={this.state.discountNumber}
+                      onFocus={() => {
+                        this.setState({
+                          showSuccessMessage: false,
+                          inputDiscountOrderFocus: true
+                        });
+                      }}
+                      onBlur={() => {
+                        this.setState({ inputDiscountOrderLostFocus: true });
+                      }}
+                      onChange={discount => {
+                        this.setState({
+                          discountNumber: discount.target.value
+                        });
+                      }}
+                      name="category-name"
+                    />
+                    <span className="systax-percent">%</span>
+                  </div>
+                </div>
+                <div
+                  className={
+                    "text-danger m-t-15px " +
+                    (this.state.inputDiscountOrderLostFocus === true &&
+                    this.state.inputDiscountOrderFocus === true &&
+                    _validateNumber(this.state.discountNumber) === false
+                      ? "Display-block"
+                      : "Display-none")
+                  }
+                >
+                  Bạn phải nhập đúng định dạng số
                 </div>
                 <div>
                   {/* processing */}
@@ -459,27 +720,66 @@ class ManageProductComponent extends Component {
                   </div>
 
                   <button
-                    className="button-add"
-                    disabled={this.setState.processing}
+                    className={
+                      "button-add " +
+                      (this.state.isEditProduct ? "display-none" : "")
+                    }
+                    disabled={
+                      this.state.processing === true ||
+                      this.state.productName === "" || 
+                      this.state.productPrice === "" || 
+                      this.state.productDescription === "" || 
+                      this.state.maxProductOrder === "" || 
+                      this.state.quantityProduct === "" || 
+                      this.state.isDiscountProduct === "" || 
+                      this.state.discountNumber === ""  ||
+                      _validateNumber(this.state.discountNumber) === false ||
+                      _validateNumber(this.state.maxProductOrder) === false ||
+                      _validateNumber(this.state.productPrice) === false ||
+                      _validateNumber(this.state.quantityProduct) === false
+                    }
                     onClick={this._addNewProduct.bind(this)}
                   >
-                    {this.state.addText}
+                    Thêm mới
+                  </button>
+
+                  <button
+                    className={
+                      "button-add " +
+                      (this.state.isEditProduct ? "" : "display-none")
+                    }
+                    disabled={this.state.processing}
+                    onClick={this._editProduct.bind(this)}
+                  >
+                    Lưu thay đổi
                   </button>
                 </div>
               </div>
             </Col>
 
-            <Col xs={12} sm={8} md={8} lg={9} className="col-padding-top">
+            <Col
+              xs={12}
+              sm={8}
+              md={8}
+              lg={9}
+              className={
+                "col-padding-top " +
+                (this.state.isEditProduct === true
+                  ? "edit-product-col-right"
+                  : "")
+              }
+            >
               <div className="tab-list-category">
-                <p className="title-tab">Danh sách Category</p>
+                <p className="title-tab">Danh sách sản phẩm</p>
                 <Table striped bordered hover>
                   <thead>
                     <tr>
-                      <th>Tên Sản phẩm</th>
-                      <th>Mô tả Sản phẩm</th>
+                      <th>Tên</th>
+                      <th>Mô tả </th>
                       <th>Giá</th>
-                      <th>Số sản phẩm đang bán</th>
-                      <th>Số sp / 1 lần mua</th>
+                      <th>Số SP đang bán</th>
+                      <th>Số SP / 1 lần mua</th>
+                      <th>Sale (%)</th>
                       <th>Chỉnh sửa</th>
                     </tr>
                   </thead>

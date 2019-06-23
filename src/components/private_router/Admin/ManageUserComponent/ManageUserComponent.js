@@ -553,6 +553,7 @@ class ManageUserComponent extends Component {
                 <Button
                   className="Loadmore-button"
                   onClick={this._loadMoreTable.bind(this, "customer")}
+                  style = {{ marginRight : 10}}
                 >
                   Load More
                 </Button>
@@ -574,6 +575,7 @@ class ManageUserComponent extends Component {
                 <Button
                   className="Loadmore-button"
                   onClick={this._loadMoreTable.bind(this, "provider")}
+                  style = {{ marginRight : 10}}
                 >
                   Load More
                 </Button>

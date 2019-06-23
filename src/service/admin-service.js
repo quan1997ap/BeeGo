@@ -60,7 +60,7 @@ export function unblockMultiUserService(arrID){
 
 // manage Category
 export function getALLCategory(){
-  return http.get(`${rootPath}api/admin/category/list`,{
+  return http.get(`${rootPath}/api/admin/category/list`,{
     cancelToken: new CancelToken(function executor(c) {
       cancel = c;
     })

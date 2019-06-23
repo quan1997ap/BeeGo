@@ -27,7 +27,8 @@ class HeaderComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPathName : ""
+      currentPathName : "",
+      searchText: ""
     };
   }
 
@@ -44,6 +45,30 @@ class HeaderComponent extends Component {
     localStorage.removeItem("token");
     localStorage.removeItem("typeUser");
     history.push("/");
+  }
+
+  _searchProduct(){
+    this.props.history.push({
+      pathname: '/search',
+      search: "?" + new URLSearchParams({search: this.state.searchText}).toString()
+    })
+  }
+
+  _profileDetail(){
+    switch(this.props.listState.authenticationInfo.role){
+      case "customer" :
+          this.props.history.push({pathname: '/customer/profile'});
+      break;
+      case "provider":
+          this.props.history.push({pathname: '/provider/manage/product'});
+        break;
+      case "admin":
+          this.props.history.push({pathname: '/admin/manage'});
+        break;
+      default:
+        break;
+    }
+  
   }
 
   _renderMenu(){
@@ -75,10 +100,10 @@ class HeaderComponent extends Component {
       return(
       <Row className= {"Row-menu " + (this.props.listState.authenticationInfo.role !== "provider" ?  "Display-none" : "")} id = "Menu-detail" >
         <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-left-menu Border-right-menu" >
-            <Link to="/provider/manage/product"  style={{ color : this.state.currentPathName === "provider/manage/product" ? "#fff" : "" }} className={"Child-Link1"} >Quản lý sản phẩm</Link>
+            <Link to="/provider/manage/product"  style={{ color : this.state.currentPathName === "/provider/manage/product" ? "#fff" : "" }} className={"Child-Link1"} >Quản lý sản phẩm</Link>
         </Col>
         <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
-            <Link to="/admin/manage/category"  style={{ color : this.state.currentPathName === "/manage/category" ? "#fff" : "" }} className="Child-Link1">Quản lý danh mục</Link>
+            <Link to="/customer/manage/category"  style={{ color : this.state.currentPathName === "/provider/manage/category" ? "#fff" : "" }} className="Child-Link1">Quản lý danh mục</Link>
         </Col>
     </Row>
      )
@@ -102,7 +127,7 @@ class HeaderComponent extends Component {
             <Row className="Center Header-contact">
               <div className="Container-custom">
                 <span>Chào mừng bạn đã đến với Bee Go !</span>
-                <Button className={"Logout-button " + (this.props.listState.authenticationInfo.isLogin !== true ? "Display-none" : "")}   onClick={this._dispatchReduxLogOut.bind(this)}> Logout !</Button>
+                <Button className={"Logout-button " + (this.props.listState.authenticationInfo.isLogin !== true ? "Display-none" : "")}   onClick={this._dispatchReduxLogOut.bind(this)}> Đăng xuất !</Button>
                 <a>
                   <i className="fab fa-twitter Icon-link" />
                 </a>
@@ -142,8 +167,10 @@ class HeaderComponent extends Component {
                     placeholder="Tìm kiếm trên BeeGo"
                     type="text"
                     name="name"
+                    onChange = { e => this.setState({searchText: e.target.value})}
                   />
-                  <Button className="Height-control Button-search">
+                  <Button className="Height-control Button-search" onClick= {this._searchProduct.bind(this)} >
+                    {/* <Link to="/search" className="search-link"> Tìm kiếm </Link> */}
                     Tìm kiếm
                   </Button>
                   <span className="Arrow-left-search" />
@@ -160,17 +187,19 @@ class HeaderComponent extends Component {
                 </ul>
               </Col>
               <Col xs={12} sm={6} md={1} lg={1} className="No-padding Cart">
-                <Link to="/list-product-of-user"  className="Top-cart-contain heading-cart">
+                <Link to="/customer/list-product-of-user"  className="Top-cart-contain heading-cart">
                   <span className="cartCount count_item_pr" id="cart-total">
                     0
                   </span>
-                  <span className="cart-text">Giỏ hàng</span>
+                  <span className="cart-text"  style={{ color : this.state.currentPathName === "/customer/list-product-of-user" ? "#dc3333" : "#656363" }} >Giỏ hàng</span>
                 </Link>
               </Col>
               <Col xs={12} sm={6} md={2} lg={2}  className={ "No-padding Account "  + (this.props.listState.authenticationInfo.isLogin !== true ? "Display-none" : "")} >
-                <Link to="/manage" className="Account-info">
-                  <li> Trang cá nhân  </li>
-                </Link>
+                {/* <Link to={this.props.listState.authenticationInfo.role === "admin" ? "/admin/manage" : "/provider/manage/product" } className="Account-info"> */}
+                <p onClick={this._profileDetail.bind(this)} className="Account-info">
+                <span className="cart-text"  style={{ color : this.state.currentPathName === "/customer/profile" ? "#dc3333" : "#656363" }} >Trang cá nhân </span>
+                </p>
+                {/* </Link> */}
               </Col>
             </Row>
 

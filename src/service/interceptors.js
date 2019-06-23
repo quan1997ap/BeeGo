@@ -1,4 +1,3 @@
-import { getStorageService } from "./storeage-service";
 import axios from "axios";
 import Promise from "promise";
 import { rootPath } from "../configs/enviroment";

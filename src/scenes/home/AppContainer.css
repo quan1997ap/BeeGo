@@ -8,3 +8,15 @@
   width: 100%;
   margin-bottom: 0rem !important;
 }
+.btn-primary:hover, .btn-primary:active, .btn-primary:focus {
+  color: #dc3333  ;
+  background-color: #ffffff ;
+  border-color: #dc3333  ;
+  box-shadow: none !important;
+}
+.container-custom{
+  max-width: 1200px;
+  display: block;
+  margin: auto auto;
+  background: #fdfdfd;
+}
