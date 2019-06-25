@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import "./ManageProduct.css";
 import { Row, Col, Button, Table, Modal, Dialog } from "react-bootstrap";
 import cancelRequest, {
-  getListCategoryWithPermision
+  getListCategoryWithPermision,
+  getALLCategory
 } from "../../../../service/admin-service";
 import Spinner from "react-spinner-material";
 import {
@@ -31,6 +32,7 @@ class ManageProductComponent extends Component {
       processing: false,
       addSuccess: false,
       showSuccessMessage: false,
+      productIdEdit: "", 
 
       // add new
       listProduct: [],
@@ -42,6 +44,7 @@ class ManageProductComponent extends Component {
       discountNumber: "",
       maxProductOrder: "",
       quantityProduct: "",
+      imageProduct: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-dXChVjiSLKFgsv9Yz-tztMMIlwKCPFsU8EcMX-KWAIjAoDyy",
 
       // edit
       isEditProduct: false,
@@ -110,22 +113,23 @@ class ManageProductComponent extends Component {
   }
 
   _getListCategoryWithPermision() {
-    axios
-      .all([
-        getListCategoryWithPermision("all", 0, 350),
-        getListCategoryWithPermision("null", 0, 350)
-      ])
-      .then(arrListCategory => {
+    getALLCategory()
+    .then(arrListCategory => {
+      if (arrListCategory && arrListCategory.data.length > 0 ){
+        let listSourceCategory = Object.assign([], arrListCategory.data );
+        let listRootCategory = listSourceCategory.filter(category => category.parentId == null);
         this.setState({
-          listSourceCategory: arrListCategory[0].data,
-          listRootCategory: arrListCategory[1].data
+          listSourceCategory: listSourceCategory,
+          listRootCategory: listRootCategory
+        }, () =>{
+          let convertDataListCategory = this._interpolationListCategory(
+            listSourceCategory,
+            listRootCategory,
+            0
+          );
+          this.setState({ listCategory: convertDataListCategory });
         });
-        let convertDataListCategory = this._interpolationListCategory(
-          arrListCategory[0].data,
-          arrListCategory[1].data,
-          0
-        );
-        this.setState({ listCategory: convertDataListCategory });
+      }
       })
       .catch(e => this.setState({ errGetCategory: e }));
   }
@@ -211,6 +215,11 @@ class ManageProductComponent extends Component {
         return (
           // chèn thêm 1 dấu cách vào trước option
           <tr key={"level-" + product._id}>
+            <td style = {{minWidth : 100}}>
+              <div className ="crop">
+                 <img src = {require("../../../../assets/image/product.jpg")} />
+              </div>
+            </td>
             <td>{product.name} </td>
             <td>{product.description} </td>
             <td>{product.price}</td>
@@ -251,20 +260,22 @@ class ManageProductComponent extends Component {
       validateErr += "Bạn phải nhập đủ các trường";
     }
   }
+
   _addNewProduct() {
     this.setState({ processing: true, showSuccessMessage: false }, () => {
       let newProduct = new ProductInfoModel(
         this.state.productName,
+        [this.state.imageProduct],
         this.state.productPrice,
         this.state.productDescription,
         this.state.maxProductOrder,
         this.state.quantityProduct,
-        this.state.categoryID,
+        this.state.categoryID === "" ? null : this.state.categoryID , 
         true,
         this.state.isDiscountProduct,
         this.state.discountNumber
       );
-        console.log(newProduct);
+      console.log(newProduct);
       addNewProduct(newProduct)
         .then(resNewsProduct => {
           console.log(resNewsProduct);
@@ -302,6 +313,7 @@ class ManageProductComponent extends Component {
         });
     });
   }
+
   _closeEdit() {
     this.setState({
       isEditProduct: false,
@@ -315,11 +327,13 @@ class ManageProductComponent extends Component {
       discountNumber: 0,
       showSuccessMessage: false,
       processing: false,
-      oldProduct: {}
+      oldProduct: {},
+      productIdEdit: ""
     });
   }
 
   _openEditProduct(oldProduct) {
+
     this.setState({
       isEditProduct: true,
       productName: oldProduct.name,
@@ -327,17 +341,19 @@ class ManageProductComponent extends Component {
       productDescription: oldProduct.description,
       quantityProduct: oldProduct.quantity,
       maxProductOrder: oldProduct.maxOrder,
-      categoryID: oldProduct.categoryId._id,
+      categoryID: oldProduct._id,
       isDiscountProduct: oldProduct.isSale,
       discountNumber: oldProduct.sale,
       showSuccessMessage: false,
       processing: false,
-      oldProduct: oldProduct
+      oldProduct: oldProduct,
+      productIdEdit : oldProduct._id
     });
   }
 
   _editProduct() {
     let productEdited = Object.assign({}, this.state.oldProduct);
+    productEdited._id = this.state.productIdEdit;
     productEdited.name = this.state.productName;
     productEdited.price = this.state.productPrice;
     productEdited.description = this.state.productDescription;
@@ -350,7 +366,7 @@ class ManageProductComponent extends Component {
     this.setState({ processing: true, showSuccessMessage: false }, () => {
       editProduct(productEdited._id, productEdited, "edit")
         .then(productUpdate => {
-          if (productUpdate.data.data.ok === 1) {
+          if (productUpdate.data.ok === 1) {
             let listProduct = Object.assign([], this.state.listProduct);
             listProduct.forEach((product, index) => {
               if (productEdited._id === product._id) {
@@ -370,16 +386,16 @@ class ManageProductComponent extends Component {
                 processing: false
               },
               () => {
-                ToastsStore.success("Thêm category thành công");
+                ToastsStore.success("Sửa category thành công");
               }
             );
           } else {
-            ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+            this.setState( { processing: false}, () => {  ToastsStore.error("Có lỗi xảy ra, hãy thử lại !"); });
           }
         })
         .catch(err => {
           console.log(err);
-          ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+          this.setState( { processing: false}, () => {  ToastsStore.error("Có lỗi xảy ra, hãy thử lại !"); });
         });
     });
   }
@@ -453,7 +469,7 @@ class ManageProductComponent extends Component {
                     (this.state.isEditProduct ? "title-tab-edit" : "")
                   }
                 >
-                  {this.state.isEditProduct == true
+                  {this.state.isEditProduct === true
                     ? "SỬA SẢN PHẨM"
                     : "THÊM MỚI SẢN PHẨM"}
                   <Button
@@ -603,6 +619,21 @@ class ManageProductComponent extends Component {
                   Bạn phải nhập đúng định dạng só
                 </div>
 
+
+                <p className="sub-title"> Chọn ảnh</p>
+                <div>
+                  <input
+                    className="input-style"
+                    type="text"
+                    value={this.state.imageProduct}
+                    onChange={imgProduct => {
+                      this.setState({ imageProduct: imgProduct.target.value });
+                    }}
+                    name="category-name"
+                  />
+                  <img src={require("../../../../assets/image/icon/select-img.jpg")} alt="Chọn ảnh" className = "choose-img"/>
+                </div>
+
                 <p className="sub-title"> Category cha</p>
                 <select
                   value={this.state.categoryID}
@@ -732,7 +763,7 @@ class ManageProductComponent extends Component {
                       this.state.maxProductOrder === "" || 
                       this.state.quantityProduct === "" || 
                       this.state.isDiscountProduct === "" || 
-                      this.state.discountNumber === ""  ||
+                      // this.state.discountNumber === ""  ||
                       _validateNumber(this.state.discountNumber) === false ||
                       _validateNumber(this.state.maxProductOrder) === false ||
                       _validateNumber(this.state.productPrice) === false ||
@@ -774,6 +805,7 @@ class ManageProductComponent extends Component {
                 <Table striped bordered hover>
                   <thead>
                     <tr>
+                      <th>Hình</th>
                       <th>Tên</th>
                       <th>Mô tả </th>
                       <th>Giá</th>

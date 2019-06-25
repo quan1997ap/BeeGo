@@ -37,7 +37,6 @@
 }
 .Container-custom > .Logout-button{
     float: right;
-    width: 80px;
     margin-left: 10px;
     color: #dc3333;
     background: white !important;

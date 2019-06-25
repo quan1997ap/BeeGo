@@ -114,6 +114,7 @@
     margin-bottom: 10px;
     text-align: left;
     font-size: 16px;
+    position: relative;
 }
 
 .sub-title {
@@ -292,8 +293,34 @@
     border-color: #ea4242;
 }
 
+.button-exit {
+    position: absolute;
+    right: 0;
+    border: 1px solid #ea4242;
+    background: #fff;
+    color: #dc3333;
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+}
+
+.button-exit>i {
+    font-size: 20px;
+    height: 40px;
+    line-height: 28px;
+    font-size: 23px;
+    text-align: center;
+    margin-left: -1px;
+}
+
 .delete-button:focus {
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
+}
+
+.editCategory {
+    padding-top: 20px;
+    max-width: 95% !important;
+    flex: 1;
 }

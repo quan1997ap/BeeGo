@@ -18,6 +18,7 @@ class _PrivateRoute extends Component {
 
   componentDidMount() {
     this._checkAcces();
+    window.scrollTo(0, 0);
   }
 
   _checkAcces() {

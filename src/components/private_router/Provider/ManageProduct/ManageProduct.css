@@ -372,3 +372,32 @@
   text-align: center;
   margin-left: -1px;
 }
+
+.crop {
+  background: #e4e7ea;
+  width: 100%;
+  padding-bottom: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  margin: 0 0 15px;
+  position: relative;
+}
+.crop img {
+  width: 100%;
+  max-height: none;
+  max-height: initial;
+  max-width: none;
+  max-width: initial;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
+}
+
+.choose-img{
+  width: 40px;
+  margin-left: 10px;
+  height: 40px;
+  cursor: pointer;
+}

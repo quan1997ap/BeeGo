@@ -67,6 +67,14 @@ export function getALLCategory(){
   });
 } 
 
+export function editCategory(category){
+  return http.post(`${rootPath}/api/admin/category/edit/${category._id}`, category,{
+    cancelToken: new CancelToken(function executor(c) {
+      cancel = c;
+    })
+  });
+} 
+
 // manage category
 export function getListCategoryWithPermision(typeGet, startIndex, endIndex){
   return http.get(`${rootPath}/api/category/list/${startIndex}-${endIndex}-${typeGet}`, {

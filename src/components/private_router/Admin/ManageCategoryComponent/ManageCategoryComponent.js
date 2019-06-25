@@ -3,8 +3,10 @@ import React, { Component } from "react";
 import { Row, Col, Button, Table, Modal, Dialog } from "react-bootstrap";
 import "./ManageCategoryComponent.css";
 import cancelRequest, {
-  getListCategoryWithPermision,
-  addNewCategoryWithPermision
+  // getListCategoryWithPermision,
+  addNewCategoryWithPermision,
+  getALLCategory,
+  editCategory
 } from "../../../../service/admin-service";
 import Spinner from "react-spinner-material";
 import {
@@ -36,9 +38,10 @@ class ManageCategoryComponent extends Component {
       categoryName: "",
       parentCategoryID: "",
       processing: false,
-      addText: "Thêm mới",
       addSuccess: false,
-      showSuccessMessage: false
+      showSuccessMessage: false,
+      editCategory: false,
+      categoryIdEdit: ""
     };
   }
 
@@ -80,27 +83,27 @@ class ManageCategoryComponent extends Component {
         );
       });
     }
-    console.log(arrResultInterpolation);
     return arrResultInterpolation;
   }
 
   _getListCategoryWithPermision() {
-    axios
-      .all([
-        getListCategoryWithPermision("all", 0, 350),
-        getListCategoryWithPermision("null", 0, 350)
-      ])
-      .then(arrListCategory => {
+    getALLCategory()
+    .then(arrListCategory => {
+      if (arrListCategory && arrListCategory.data.length > 0 ){
+        let listSourceCategory = Object.assign([], arrListCategory.data );
+        let listRootCategory = listSourceCategory.filter(category => category.parentId == null);
         this.setState({
-          listSourceCategory: arrListCategory[0].data,
-          listRootCategory: arrListCategory[1].data
+          listSourceCategory: listSourceCategory,
+          listRootCategory: listRootCategory
+        }, () =>{
+          let convertDataListCategory = this._interpolationListCategory(
+            listSourceCategory,
+            listRootCategory,
+            0
+          );
+          this.setState({ listCategory: convertDataListCategory });
         });
-        let convertDataListCategory = this._interpolationListCategory(
-          arrListCategory[0].data,
-          arrListCategory[1].data,
-          0
-        );
-        this.setState({ listCategory: convertDataListCategory });
+      }
       })
       .catch(e => this.setState({ errGetCategory: e }));
   }
@@ -179,9 +182,6 @@ class ManageCategoryComponent extends Component {
     return listOption;
   }
 
-  // subString(string, minLength,maxLength){
-
-  // }
 
   _renderListCategory(listCategory) {
     // nội suy để tạo table các category
@@ -202,7 +202,7 @@ class ManageCategoryComponent extends Component {
               {itemCategory.isShow.toString()}
             </div>
             <div>
-              <Button className="edit-button">Edit</Button>
+              <Button className="edit-button" onClick={this._openEdit.bind(this,itemCategory._id, itemCategory.name, itemCategory.parentId )}>Edit</Button>
               <Button className="delete-button">Del</Button>
             </div>
           </div>
@@ -317,7 +317,7 @@ class ManageCategoryComponent extends Component {
           }
         })
         .catch(errData => {
-          this.setState({ processing: false,addSuccess: false, showSuccessMessage: false });
+          this.setState({ processing: false, addSuccess: false, showSuccessMessage: false });
           ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
           console.log(errData);
         });
@@ -325,6 +325,49 @@ class ManageCategoryComponent extends Component {
 
   }
 
+  _editCategory(){
+    console.log(this.state.categoryIdEdit, this.state.categoryName, this.state.parentCategoryID)
+    let categoryEdited = {_id : this.state.categoryIdEdit , parentId: this.state.parentCategoryID !== ""  ? this.state.parentCategoryID : null , name:this.state.categoryName , isShow: true }
+    this.setState({ processing: true, showSuccessMessage: false }, () => {
+      editCategory(categoryEdited).then(
+        resEditCategory =>{
+          if (resEditCategory && resEditCategory.data.ok === 1){
+            ToastsStore.success("Sửa category thành công");
+            this._getListCategoryWithPermision();
+            this.setState({
+              processing: false,
+              editCategory: false,
+              categoryName : "",
+              parentCategoryID :  "",
+              categoryIdEdit: ""
+            })
+          }
+          else{
+            ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+          }
+        }
+      )
+    })
+  }
+
+  _closeEdit(){
+    this.setState({
+      editCategory: false,
+      categoryName : "",
+      parentCategoryID :  "",
+      categoryIdEdit: ""
+    })
+  }
+
+  _openEdit(id , name, parentId){
+    this.setState({
+      editCategory: true,
+      categoryName : name,
+      parentCategoryID : parentId ? parentId._id : "",
+      categoryIdEdit: id
+    })
+  }
+  
   render() {
     return (
       <div className="Profile-component">
@@ -335,9 +378,20 @@ class ManageCategoryComponent extends Component {
 
         <div className="container-login100 Profile">
           <Row>
-            <Col xs={12} sm={4} md={4} lg={3} className="col-padding-top">
+            <Col xs={12} sm={4} md={4} lg={3} className={"col-padding-top " + (this.state.editCategory === true ? "editCategory" : "" )}>
               <div className="tab-add-category">
-                <p className="title-tab">Thêm mới Category</p>
+                <p className="title-tab"> {this.state.editCategory === false ? "Thêm mới Category" : "Sửa Category"}
+                  <Button
+                      className={
+                        this.state.editCategory === true
+                          ? "button-exit"
+                          : "display-none"
+                      }
+                      onClick={this._closeEdit.bind(this)}
+                    >
+                      <i className="fas fa-times" />
+                  </Button>
+                </p>
                 <p className="sub-title"> Tên category</p>
                 <input
                   className="input-style"
@@ -352,11 +406,12 @@ class ManageCategoryComponent extends Component {
                 <p className="sub-title"> Category cha</p>
                 <select
                   className="input-style"
+                  value= {this.state.parentCategoryID}
                   onChange={parentId =>
-                    this.setState({ parentCategoryID: parentId.target.value })
+                    this.setState({ parentCategoryID: parentId.target.value }, () => {console.log('a',this.state.parentCategoryID)})
                   }
                 >
-                  <option key="no-parent" value="">
+                  <option key="no-parent" value= "">
                     Không có
                   </option>
                   {this.state.listCategory.length > 0 ? (
@@ -421,17 +476,26 @@ class ManageCategoryComponent extends Component {
                   </div>
 
                   <button
-                    className="button-add"
+                    className= {this.state.editCategory === true  ? "d-none" : "button-add"}
                     disabled={this.setState.processing}
                     onClick={this._addNewCategory.bind(this)}
                   >
-                    {this.state.addText}
+                    {this.state.processing === true ? "Đang thêm ..." :"Thêm mới"}
                   </button>
+
+                  <button
+                    className= {this.state.editCategory === true ? "button-add" : "d-none"}
+                    disabled={this.setState.processing}
+                    onClick={this._editCategory.bind(this)}
+                  >
+                    {this.state.processing === true ? "Đang sửa ..." :"Sửa"}
+                  </button>
+                  
                 </div>
               </div>
             </Col>
 
-            <Col xs={12} sm={8} md={8} lg={9} className="col-padding-top">
+            <Col xs={12} sm={8} md={8} lg={9} className={"col-padding-top " + (this.state.editCategory === true ? "d-none" : "" )}>
               <div className="tab-list-category">
                 <p className="title-tab">Danh sách Category</p>
                 <div>

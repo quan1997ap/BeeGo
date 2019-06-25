@@ -1,6 +1,7 @@
 export class ProductInfoModel{
-  constructor( name, price ,description, maxOrder, quantity, categoryId, isShow, isSale, sale  ) {
+  constructor( name, images ,price ,description, maxOrder, quantity, categoryId, isShow, isSale, sale  ) {
     this.name = name;
+    this.images = images;
     this.price = price;
     this.description = description;
     this.isSale = isSale;
