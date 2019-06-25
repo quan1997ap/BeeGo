@@ -4,7 +4,13 @@ import "./ProductList.css";
 import { Row, Col, Button } from "react-bootstrap";
 // import ReadMoreReact from "./node_modules/read-more-react";
 import { getProductByCategoryId } from "../../../../service/customer-service";
+import { addItemsToCart } from "../../../../service/cart-service";
 import { withRouter } from 'react-router-dom';
+import {
+  ToastsContainer,
+  ToastsStore,
+  ToastsContainerPosition
+} from "react-toasts";
 
 class _ProductList extends React.Component {
   constructor(props) {
@@ -17,10 +23,10 @@ class _ProductList extends React.Component {
 
   componentDidMount() {
     getProductByCategoryId(this.props.categoryID).then(resProducts => {
-      if(resProducts.data.length > 0){
-        this.setState({ productList: resProducts.data, categoryName : resProducts.data[0].category  }, () => {
+      if (resProducts.data.length > 0) {
+        this.setState({ productList: resProducts.data, categoryName: resProducts.data[0].category }, () => {
           console.log(this.state.productList);
-        }); 
+        });
       }
     });
   }
@@ -33,11 +39,22 @@ class _ProductList extends React.Component {
     }
   }
 
-  _addProductToCart(){
-    this.props.history.push({
-      pathname: 'customer/list-product-of-user',
-      search: "?" + new URLSearchParams({search: this.state.searchText}).toString()
-    })
+  _addProductToCart(id) {
+    let data = {
+      products: [id]
+    };
+    console.log(data)
+    addItemsToCart(data)
+      .then(data => {
+        console.log(data)
+        this.props.history.push({
+          pathname: 'customer/list-product-of-user',
+          search: "?" + new URLSearchParams({ search: this.state.searchText }).toString(),
+          itemsId: id
+        })
+      })
+      .catch(error => ToastsStore.error("Có khi thêm hàng vào giỏ, hãy thử lại !"));
+
   }
 
   renderListProduct() {
@@ -57,9 +74,9 @@ class _ProductList extends React.Component {
               <span className="sell-number"> {this.state.productList[index].ordered} đã bán</span>
             </div>
           </div>
-          <div className = "add-to-cart" onClick= {this._addProductToCart.bind(this)}>
-            Mua ngay 
-            <img src = {require("../../../../assets/image/icon/add-cart.jpg")} className="icon-cart" />
+          <div className="add-to-cart" onClick={this._addProductToCart.bind(this, product._id)}>
+            Mua ngay
+            <img src={require("../../../../assets/image/icon/add-cart.jpg")} className="icon-cart" />
           </div>
         </div>
       </Col>
@@ -70,6 +87,10 @@ class _ProductList extends React.Component {
   render() {
     return (
       <div className="full-width">
+        <ToastsContainer
+          store={ToastsStore}
+          position={ToastsContainerPosition.TOP_RIGHT}
+        />
         <p className="title-slider-category">{this.state.categoryName}</p>
         <Row className="no-margin" >
           {this.renderListProduct()}
@@ -79,4 +100,4 @@ class _ProductList extends React.Component {
   }
 }
 
-export const ProductList =  withRouter(_ProductList);
+export const ProductList = withRouter(_ProductList);

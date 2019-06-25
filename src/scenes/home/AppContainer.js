@@ -25,7 +25,7 @@ import LoginComponent from "../../components/private_router/General/LoginCompone
 import SignUpComponent from "../../components/private_router/General/SignUpComponent/SignUpComponent";
 import NoMatchComponent from "../../components/public_router/NoMatchComponent/NoMatchComponent";
 import HomeComponent from "../../components/public_router/HomeComponent/HomeComponent";
-import ListProductOfUserComponent from "../../components/private_router/Customer/ListProductOfUserComponent/ListProductOfUserComponent";
+import Cart from "../../components/private_router/Customer/Cart/Cart";
 import PrivateRoute from "./PrivateRoute";
 import SearchComponent from "../../components/public_router/SearchComponent/SearchComponent";
 // admin
@@ -133,7 +133,7 @@ class AppContainer extends Component {
                 <PrivateRoute  path="/provider/manage/product" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "provider" component={ManageProductComponent} />
                 
                 {/* Customer */}
-                <PrivateRoute path="/customer/list-product-of-user"  exact  authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter="customer" component={ListProductOfUserComponent} />        
+                <PrivateRoute path="/customer/list-product-of-user"  exact  authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter="customer" component={Cart} />        
                   <PrivateRoute path="/customer/profile"  exact  authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter="customer" component={ProfileComponent} />                            
                
                 {/* Admin */}
