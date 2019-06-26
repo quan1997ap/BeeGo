@@ -54,6 +54,7 @@
 .div-lever-col-3 {
     width: 100px;
     padding: 0 15px;
+    text-align: center;
 }
 
 .div-lever-col-4 {
@@ -323,4 +324,10 @@
     padding-top: 20px;
     max-width: 95% !important;
     flex: 1;
+}
+.cover-button-edit{
+    justify-content: center;
+    width: 100px;
+    display: flex;
+    align-items: center;
 }

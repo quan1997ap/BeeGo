@@ -3,7 +3,6 @@ import "./ManageProduct.css";
 import { Row, Col, Button, Table, Modal, Dialog } from "react-bootstrap";
 import cancelRequest, {
   getListCategoryWithPermision,
-  getALLCategory
 } from "../../../../service/admin-service";
 import Spinner from "react-spinner-material";
 import {
@@ -17,7 +16,8 @@ import ReadMoreReact from "read-more-react";
 import {
   addNewProduct,
   getAllProductOfProvider,
-  editProduct
+  editProduct,
+  getALLCategoryForProvider
 } from "../../../../service/provider-service";
 import { _validateNumber } from "../../../../configs/validates";
 
@@ -113,8 +113,9 @@ class ManageProductComponent extends Component {
   }
 
   _getListCategoryWithPermision() {
-    getALLCategory()
+    getALLCategoryForProvider()
     .then(arrListCategory => {
+      console.log(arrListCategory)
       if (arrListCategory && arrListCategory.data.length > 0 ){
         let listSourceCategory = Object.assign([], arrListCategory.data );
         let listRootCategory = listSourceCategory.filter(category => category.parentId == null);
@@ -211,7 +212,7 @@ class ManageProductComponent extends Component {
   _renderListProduct(listProduct) {
     let listProductDetail;
     listProductDetail = listProduct.map((product, index) => {
-      if (product.isShow == true) {
+      if (product.isShow === true) {
         return (
           // chèn thêm 1 dấu cách vào trước option
           <tr key={"level-" + product._id}>
@@ -386,7 +387,7 @@ class ManageProductComponent extends Component {
                 processing: false
               },
               () => {
-                ToastsStore.success("Sửa category thành công");
+                ToastsStore.success("Sửa sản phẩm thành công");
               }
             );
           } else {

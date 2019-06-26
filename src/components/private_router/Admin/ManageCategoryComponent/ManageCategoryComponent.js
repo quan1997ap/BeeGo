@@ -16,7 +16,7 @@ import {
 } from "react-toasts";
 import { CategoryInfoModel } from "../../../../model/categoryinfo.model";
 import axios from "axios";
-import ReadMoreReact from 'read-more-react';
+import ReadMoreReact from "read-more-react";
 
 // y tưởng :
 // Dùng phương pháp đệ quy => biến đổi từ mảng chứa tất cả các category => mảng Lồng nhau(cha chứa con)
@@ -88,22 +88,27 @@ class ManageCategoryComponent extends Component {
 
   _getListCategoryWithPermision() {
     getALLCategory()
-    .then(arrListCategory => {
-      if (arrListCategory && arrListCategory.data.length > 0 ){
-        let listSourceCategory = Object.assign([], arrListCategory.data );
-        let listRootCategory = listSourceCategory.filter(category => category.parentId == null);
-        this.setState({
-          listSourceCategory: listSourceCategory,
-          listRootCategory: listRootCategory
-        }, () =>{
-          let convertDataListCategory = this._interpolationListCategory(
-            listSourceCategory,
-            listRootCategory,
-            0
+      .then(arrListCategory => {
+        if (arrListCategory && arrListCategory.data.length > 0) {
+          let listSourceCategory = Object.assign([], arrListCategory.data);
+          let listRootCategory = listSourceCategory.filter(
+            category => category.parentId == null
           );
-          this.setState({ listCategory: convertDataListCategory });
-        });
-      }
+          this.setState(
+            {
+              listSourceCategory: listSourceCategory,
+              listRootCategory: listRootCategory
+            },
+            () => {
+              let convertDataListCategory = this._interpolationListCategory(
+                listSourceCategory,
+                listRootCategory,
+                0
+              );
+              this.setState({ listCategory: convertDataListCategory });
+            }
+          );
+        }
       })
       .catch(e => this.setState({ errGetCategory: e }));
   }
@@ -182,7 +187,6 @@ class ManageCategoryComponent extends Component {
     return listOption;
   }
 
-
   _renderListCategory(listCategory) {
     // nội suy để tạo table các category
     let listCategoryDetail;
@@ -197,13 +201,24 @@ class ManageCategoryComponent extends Component {
             {/* <div> <ReadMoreReact min={20}  max={100} readMoreText={"xem thêm"} text={itemCategory.name} /> </div> */}
             <div> {itemCategory.name} </div>
             <div className="div-lever-col-2"> {itemCategory._id}</div>
-            <div className="div-lever-col-3">
-              {" "}
-              {itemCategory.isShow.toString()}
+            <div className="div-lever-col-3 text-center">
+              {/* {itemCategory.isShow !== null ? itemCategory.isShow.toString() : "null"} */}
+              <i className= { "fa fa-lock text-danger " + (itemCategory.isShow  === true ? "d-none": "") } aria-hidden="true"></i>
+              <i className= { "fa fa-unlock-alt text-success " + (itemCategory.isShow  === true ? "": "d-none") } aria-hidden="true"></i>
             </div>
-            <div>
-              <Button className="edit-button" onClick={this._openEdit.bind(this,itemCategory._id, itemCategory.name, itemCategory.parentId )}>Edit</Button>
-              <Button className="delete-button">Del</Button>
+            <div className="cover-button-edit">
+              <Button
+                className="edit-button"
+                onClick={this._openEdit.bind(
+                  this,
+                  itemCategory._id,
+                  itemCategory.name,
+                  itemCategory.parentId,
+                  itemCategory.isShow
+                )}
+              >
+                Edit
+              </Button>
             </div>
           </div>
         );
@@ -224,7 +239,6 @@ class ManageCategoryComponent extends Component {
   }
 
   _addNewCategory() {
-
     this.setState({ processing: true, showSuccessMessage: false }, () => {
       let newCategory = new CategoryInfoModel();
       newCategory.name = this.state.categoryName;
@@ -233,10 +247,9 @@ class ManageCategoryComponent extends Component {
       addNewCategoryWithPermision(newCategory)
         .then(resData => {
           if (resData.data.message === "Add category success") {
-            
             if (newCategory._id !== null && newCategory.parentId !== "") {
               this.setState(
-                { 
+                {
                   listSourceCategory: this.state.listSourceCategory.concat([
                     {
                       parentId: {
@@ -317,57 +330,79 @@ class ManageCategoryComponent extends Component {
           }
         })
         .catch(errData => {
-          this.setState({ processing: false, addSuccess: false, showSuccessMessage: false });
+          this.setState({
+            processing: false,
+            addSuccess: false,
+            showSuccessMessage: false
+          });
           ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
           console.log(errData);
         });
     });
-
   }
 
-  _editCategory(){
-    console.log(this.state.categoryIdEdit, this.state.categoryName, this.state.parentCategoryID)
-    let categoryEdited = {_id : this.state.categoryIdEdit , parentId: this.state.parentCategoryID !== ""  ? this.state.parentCategoryID : null , name:this.state.categoryName , isShow: true }
+  _editCategory() {
+    console.log(
+      this.state.categoryIdEdit,
+      this.state.categoryName,
+      this.state.parentCategoryID,
+      this.state.isShowCategory
+    );
+    let categoryEdited = {
+      _id: this.state.categoryIdEdit,
+      parentId:
+        this.state.parentCategoryID !== "" ? this.state.parentCategoryID : null,
+      name: this.state.categoryName,
+      isShow: this.state.isShowCategory
+    };
     this.setState({ processing: true, showSuccessMessage: false }, () => {
-      editCategory(categoryEdited).then(
-        resEditCategory =>{
-          if (resEditCategory && resEditCategory.data.ok === 1){
+      editCategory(categoryEdited)
+        .then(resEditCategory => {
+          console.log(resEditCategory)
+          if (resEditCategory && resEditCategory.data.ok === 1) {
+            
             ToastsStore.success("Sửa category thành công");
             this._getListCategoryWithPermision();
             this.setState({
               processing: false,
               editCategory: false,
-              categoryName : "",
-              parentCategoryID :  "",
+              categoryName: "",
+              parentCategoryID: "",
               categoryIdEdit: ""
-            })
-          }
-          else{
+            });
+          } else {
             ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
           }
-        }
-      )
-    })
+        })
+        .catch(e => {
+          this.setState({
+            processing: false
+          });
+          ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+        });
+    });
   }
 
-  _closeEdit(){
+  _closeEdit() {
     this.setState({
       editCategory: false,
-      categoryName : "",
-      parentCategoryID :  "",
+      categoryName: "",
+      parentCategoryID: "",
       categoryIdEdit: ""
-    })
+    });
   }
 
-  _openEdit(id , name, parentId){
+  _openEdit(id, name, parentId, isShow) {
+    let _isShow  = isShow !== null ? true : false;
     this.setState({
       editCategory: true,
-      categoryName : name,
-      parentCategoryID : parentId ? parentId._id : "",
-      categoryIdEdit: id
-    })
+      categoryName: name,
+      parentCategoryID: parentId ? parentId._id : "",
+      categoryIdEdit: id,
+      isShowCategory: _isShow
+    });
   }
-  
+
   render() {
     return (
       <div className="Profile-component">
@@ -378,18 +413,31 @@ class ManageCategoryComponent extends Component {
 
         <div className="container-login100 Profile">
           <Row>
-            <Col xs={12} sm={4} md={4} lg={3} className={"col-padding-top " + (this.state.editCategory === true ? "editCategory" : "" )}>
+            <Col
+              xs={12}
+              sm={4}
+              md={4}
+              lg={3}
+              className={
+                "col-padding-top " +
+                (this.state.editCategory === true ? "editCategory" : "")
+              }
+            >
               <div className="tab-add-category">
-                <p className="title-tab"> {this.state.editCategory === false ? "Thêm mới Category" : "Sửa Category"}
+                <p className="title-tab">
+                  {" "}
+                  {this.state.editCategory === false
+                    ? "Thêm mới Category"
+                    : "Sửa Category"}
                   <Button
-                      className={
-                        this.state.editCategory === true
-                          ? "button-exit"
-                          : "display-none"
-                      }
-                      onClick={this._closeEdit.bind(this)}
-                    >
-                      <i className="fas fa-times" />
+                    className={
+                      this.state.editCategory === true
+                        ? "button-exit"
+                        : "display-none"
+                    }
+                    onClick={this._closeEdit.bind(this)}
+                  >
+                    <i className="fas fa-times" />
                   </Button>
                 </p>
                 <p className="sub-title"> Tên category</p>
@@ -397,7 +445,9 @@ class ManageCategoryComponent extends Component {
                   className="input-style"
                   type="text"
                   defaultValue={this.state.categoryName}
-                  onFocus = { () => {this.setState( {showSuccessMessage : false})}}
+                  onFocus={() => {
+                    this.setState({ showSuccessMessage: false });
+                  }}
                   onBlur={categoryName => {
                     this.setState({ categoryName: categoryName.target.value });
                   }}
@@ -406,12 +456,17 @@ class ManageCategoryComponent extends Component {
                 <p className="sub-title"> Category cha</p>
                 <select
                   className="input-style"
-                  value= {this.state.parentCategoryID}
+                  value={this.state.parentCategoryID}
                   onChange={parentId =>
-                    this.setState({ parentCategoryID: parentId.target.value }, () => {console.log('a',this.state.parentCategoryID)})
+                    this.setState(
+                      { parentCategoryID: parentId.target.value },
+                      () => {
+                        // console.log(this.state.parentCategoryID);
+                      }
+                    )
                   }
                 >
-                  <option key="no-parent" value= "">
+                  <option key="no-parent" value="">
                     Không có
                   </option>
                   {this.state.listCategory.length > 0 ? (
@@ -435,7 +490,7 @@ class ManageCategoryComponent extends Component {
                           isShowCategory: !this.state.isShowCategory
                         },
                         () => {
-                          console.log(this.state.isShowCategory);
+                          // console.log(this.state.isShowCategory);
                         }
                       )
                     }
@@ -460,42 +515,68 @@ class ManageCategoryComponent extends Component {
                     />
                     <span>Processing ...</span>
                   </div>
-                  
+
                   {/* responseMessage */}
                   <div
                     className={
                       "Processing " +
-                      (this.state.processing === false && this.state.showSuccessMessage === true
+                      (this.state.processing === false &&
+                      this.state.showSuccessMessage === true
                         ? "block"
                         : "display-none") +
                       (this.state.addSuccess === true ? " SUCCESS" : " FAIL")
                     }
                   >
-                    <i className= {(this.state.addSuccess === true ? "far fa-check-circle" : "far fa-times-circle")}></i>
-                    <span> {this.state.addSuccess === true ? "Thành công" : "Thất bại"} </span>
+                    <i
+                      className={
+                        this.state.addSuccess === true
+                          ? "far fa-check-circle"
+                          : "far fa-times-circle"
+                      }
+                    />
+                    <span>
+                      {" "}
+                      {this.state.addSuccess === true
+                        ? "Thành công"
+                        : "Thất bại"}{" "}
+                    </span>
                   </div>
 
                   <button
-                    className= {this.state.editCategory === true  ? "d-none" : "button-add"}
+                    className={
+                      this.state.editCategory === true ? "d-none" : "button-add"
+                    }
                     disabled={this.setState.processing}
                     onClick={this._addNewCategory.bind(this)}
                   >
-                    {this.state.processing === true ? "Đang thêm ..." :"Thêm mới"}
+                    {this.state.processing === true
+                      ? "Đang thêm ..."
+                      : "Thêm mới"}
                   </button>
 
                   <button
-                    className= {this.state.editCategory === true ? "button-add" : "d-none"}
+                    className={
+                      this.state.editCategory === true ? "button-add" : "d-none"
+                    }
                     disabled={this.setState.processing}
                     onClick={this._editCategory.bind(this)}
                   >
-                    {this.state.processing === true ? "Đang sửa ..." :"Sửa"}
+                    {this.state.processing === true ? "Đang sửa ..." : "Sửa"}
                   </button>
-                  
                 </div>
               </div>
             </Col>
 
-            <Col xs={12} sm={8} md={8} lg={9} className={"col-padding-top " + (this.state.editCategory === true ? "d-none" : "" )}>
+            <Col
+              xs={12}
+              sm={8}
+              md={8}
+              lg={9}
+              className={
+                "col-padding-top " +
+                (this.state.editCategory === true ? "d-none" : "")
+              }
+            >
               <div className="tab-list-category">
                 <p className="title-tab">Danh sách Category</p>
                 <div>

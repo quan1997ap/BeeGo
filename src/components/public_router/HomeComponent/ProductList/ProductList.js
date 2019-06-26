@@ -2,7 +2,6 @@ import React from "react";
 import Slider from "react-slick";
 import "./ProductList.css";
 import { Row, Col, Button } from "react-bootstrap";
-// import ReadMoreReact from "./node_modules/read-more-react";
 import { getProductByCategoryId } from "../../../../service/customer-service";
 import { withRouter } from 'react-router-dom';
 
@@ -16,10 +15,12 @@ class _ProductList extends React.Component {
   }
 
   componentDidMount() {
+    // console.log('vao', this.props.categoryID);
     getProductByCategoryId(this.props.categoryID).then(resProducts => {
+      console.log(resProducts)
       if(resProducts.data.length > 0){
         this.setState({ productList: resProducts.data, categoryName : resProducts.data[0].category  }, () => {
-          console.log(this.state.productList);
+          console.log('list',this.state.productList);
         }); 
       }
     });

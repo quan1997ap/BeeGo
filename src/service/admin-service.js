@@ -75,7 +75,6 @@ export function editCategory(category){
   });
 } 
 
-// manage category
 export function getListCategoryWithPermision(typeGet, startIndex, endIndex){
   return http.get(`${rootPath}/api/category/list/${startIndex}-${endIndex}-${typeGet}`, {
     cancelToken: new CancelToken(function executor(c) {
@@ -83,6 +82,7 @@ export function getListCategoryWithPermision(typeGet, startIndex, endIndex){
     })
   });
 } 
+
 
 export function addNewCategoryWithPermision(newCategory){
   return http.post(`${rootPath}/api/admin/category/add`, {
@@ -95,6 +95,15 @@ export function addNewCategoryWithPermision(newCategory){
     })
   });
 } 
+
+export function getProductsForDiscount(){
+  return http.get(`${rootPath}/api/admin/discount/products`, {
+    cancelToken: new CancelToken(function executor(c) {
+      cancel = c;
+    })
+  });
+} 
+
 
 
 // payment 

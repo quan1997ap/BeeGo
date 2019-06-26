@@ -7,6 +7,15 @@ let cancel;
 
 // manage Product
 
+// manage Category
+export function getALLCategoryForProvider(){
+  return http.get(`${rootPath}/api/category/list`,{
+    cancelToken: new CancelToken(function executor(c) {
+      cancel = c;
+    })
+  });
+} 
+
 export function getAllProductOfProvider(){
   return http.get(`${rootPath}/api/provider/product/list`,{
     cancelToken: new CancelToken(function executor(c) {
