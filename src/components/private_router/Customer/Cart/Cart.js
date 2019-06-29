@@ -14,7 +14,11 @@ import {
 import { _formatCurrency, getStatus } from "../../../../configs/format";
 import { Row, Col, Button, Table, Modal, Dialog } from "react-bootstrap";
 import Spinner from "react-spinner-material";
-
+import {
+  ToastsContainer,
+  ToastsStore,
+  ToastsContainerPosition
+} from "react-toasts";
 
 class Cart extends Component {
   state = {
@@ -30,7 +34,7 @@ class Cart extends Component {
     showModal: false,
     isLoading: true,
     comment: "",
-    currentOrder: {}
+    currentOrder: {},
   };
 
   componentDidMount() {
@@ -110,8 +114,8 @@ class Cart extends Component {
               <td>Xác nhận đã nhận hàng</td>
               <td>
                 <Button className = {order.status === 2 ? "" : "d-none"}  onClick={() => this._handleOpenModal(order)}>
-                  Xác nhận
-                </Button>{" "}
+                  Xác nhận{order.status}
+                </Button>
               </td>
             </tr>
           </tbody>
@@ -217,11 +221,25 @@ class Cart extends Component {
       payload.discountId = this.state.discountId;
     }
 
+    payload.name = this.state.userInfo.name;
+    payload.email = this.state.userInfo.email;
+    payload.address = this.state.userInfo.address;
+    payload.phone = this.state.userInfo.phone;
+
     payBill(payload)
-      .then(data => {
-        this.deleteItem(item._id);
+      .then(resAddCart => {
+        if (resAddCart.data.ok === 1){
+          this.deleteItem(item._id);
+          this.props.history.push({
+            pathname: "/customer/list-product-of-user"
+          });
+          ToastsStore.success("Thêm sản phẩm thành công");
+        }
+        else{
+          ToastsStore.error(resAddCart.data.message);
+        }
       })
-      .catch(error => console.log(error));
+      .catch(error => {ToastsStore.error("Có lỗi xảy ra, hãy thử lại !"); console.log(error)});
   }
 
   renderCartItems() {
@@ -273,6 +291,13 @@ class Cart extends Component {
       showModal: false,
       isLoading: false,
     });
+  }
+
+  _handleAcceptModal(){
+    this.setState({
+      showModal: false,
+      // isLoading: false,
+    });
     let acceptInfo = Object.create({});
     acceptInfo.orderId = this.state.currentOrder._id;
     acceptInfo.comment = this.state.comment;
@@ -280,7 +305,19 @@ class Cart extends Component {
     acceptInfo.email = this.state.userInfo.email;
     acceptInfo.address = this.state.userInfo.address;
     acceptInfo.phone = this.state.userInfo.phone;
-    console.log(acceptInfo)
+    orderSuccess(acceptInfo).then(
+      resAccept => {
+        if(resAccept.data.ok === 1){
+          ToastsStore.success("Xác nhận thành công");
+          this.props.history.push({
+            pathname: "/customer/list-product-of-user"
+          });
+        }
+        else{
+          ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+        }
+      }
+    )
   }
 
   _handleOpenModal = (order) => {
@@ -294,6 +331,10 @@ class Cart extends Component {
   render() {
     return (
       <div className="container-custom">
+        <ToastsContainer
+          store={ToastsStore}
+          position={ToastsContainerPosition.TOP_RIGHT}
+        />
         <Modal
           show={this.state.showModal}
           onHide={this._handleCloseModal.bind(this)}
@@ -322,6 +363,7 @@ class Cart extends Component {
             </div>
             <Button
               variant="primary"
+              onClick = {() =>{ this._handleAcceptModal()}}
             >
               Xác nhận
             </Button>

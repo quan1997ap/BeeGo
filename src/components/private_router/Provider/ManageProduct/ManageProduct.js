@@ -90,7 +90,7 @@ class ManageProductComponent extends Component {
   _renderImgsUploaded() {
     let imgs = this.state.imgFilesUpLoadedName.map((imgName, index) => (
       <div className="crop crop-thumnail-img" key={index}>
-        <img src={"http://food.negoo.tech/api/file?filename=" + imgName + "&size=30x30"} />
+        <img src={"http://food.negoo.tk/api/file?filename=" + imgName + "&size=30x30"} />
       </div>
     ));
     return imgs;
@@ -286,7 +286,7 @@ class ManageProductComponent extends Component {
           <tr key={"level-" + product._id}>
             <td style={{ minWidth: 100 }}>
               <div className="crop">
-                <img src={ product.images && product.images[0] ? ("http://food.negoo.tech/api/file?filename=" + product.images[0]) : require("../../../../assets/image/product.jpg") }  />
+                <img src={ product.images && product.images[0] ? ("http://food.negoo.tk/api/file?filename=" + product.images[0]) : require("../../../../assets/image/product.jpg") }  />
               </div>
             </td>
             <td>{product.name} </td>

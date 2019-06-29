@@ -22,8 +22,8 @@ const ManageOrderComponent = () => {
   const [changing, setchanging] = useState(false);
 
   // useEffect(() => {
-  //   console.log(orderStatus);
-  // }, [orderStatus])
+  //   console.log(showDetail);
+  // }, [showDetail])
 
   // useEffect(() => {
   //   console.log(showDetail);
@@ -31,12 +31,16 @@ const ManageOrderComponent = () => {
 
   //component did mount
   useEffect(() => {
+    _getOrders();
+  }, []);
+
+  const _getOrders = (orderId) =>{
     getAllOrder().then(resOrders => {
       if (resOrders && resOrders.data) {
         setOrderList(resOrders.data);
       }
     });
-  }, []);
+  }
 
   const _acceptOrder = (orderId) =>{
     setchanging(true);
@@ -55,13 +59,16 @@ const ManageOrderComponent = () => {
     deliveryOrder(orderId).then(
       resDeliveryOrder =>{
         if(resDeliveryOrder.data && resDeliveryOrder.data.ok === 1){
-            console.log(resDeliveryOrder.data)
             setchanging(false);
             getAllOrder().then(resOrders => {
               if (resOrders && resOrders.data) {
                 setOrderList(resOrders.data);
+                ToastsStore.success("Thay Đổi trạng thái thành công thành công");
+                closeOrderDetail();
               }
             });
+        } else{
+          ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
         }
       }
     )
@@ -73,6 +80,11 @@ const ManageOrderComponent = () => {
     setorderStatus(orderDetail.status);
     let _infoUserDetail =  (infoDetail.customerId && infoDetail.customerId.info !== undefined) ? infoDetail.customerId.info : {name : "", address: "", phone: ""} ;
     setcustomerDetail(_infoUserDetail);
+  };
+
+  const closeOrderDetail = () => {
+    _getOrders();
+    // setshowDetail(!showDetail);
   };
 
   const renderOrderList = () => {
@@ -195,6 +207,7 @@ const ManageOrderComponent = () => {
                 <Button className = { orderDetail.status === 1 ? "" :"d-none" } 
                   onClick = {() => _deliveryOrder(orderDetail._id)}
                 >{changing ? "Đang chuyển trạng thái ..." : "Giao hàng" }</Button>
+                <h4 className = { orderDetail.status === 2 ? "" :"d-none" } >Đơn giao đang được vận chuyển </h4>
                 <h4 className = { orderDetail.status === 3 ? "" :"d-none" } >Đơn giao hoàn thành </h4>
                 <h4 className = { orderDetail.status === 4 ? "" :"d-none" } >Đơn hàng bị hủy </h4>
               </td>

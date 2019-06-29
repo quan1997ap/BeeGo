@@ -74,7 +74,7 @@ export function acceptOrder(orderId){
 } 
 
 export function deliveryOrder(orderId){
-  return http.post(`${rootPath}/api/provider/order/nhan-don/${orderId}`,{
+  return http.post(`${rootPath}/api/provider/order/giao-hang/${orderId}`,{
     cancelToken: new CancelToken(function executor(c) {
       cancel = c;
     })

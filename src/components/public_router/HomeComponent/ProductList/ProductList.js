@@ -61,7 +61,7 @@ class _ProductList extends React.Component {
         <div className="cartProductCover">
           <div className="cartProduct">
             <div className="crop">
-              <img src={ product.images && product.images[0] ? ("http://food.negoo.tech/api/file?filename=" + product.images[0]) : require("../../../../assets/image/product.jpg") }  />
+              <img src={ product.images && product.images[0] ? ("http://food.negoo.tk/api/file?filename=" + product.images[0]) : require("../../../../assets/image/product.jpg") }  />
             </div>
             <p className="name-product">
               {this._sliceText(this.state.productList[index].name, 56)}
