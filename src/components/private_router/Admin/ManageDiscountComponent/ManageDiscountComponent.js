@@ -3,7 +3,17 @@ import "../../../../styles/mainconfig.css";
 import "../../../../styles/main.css";
 import "./ManageDiscountComponent.css";
 import { Row, Col, Button } from "react-bootstrap";
-import { getProductsForDiscount } from "../../../../service/admin-service";
+import {
+  getProductsForDiscount,
+  addNewDiscountWithPermision
+} from "../../../../service/admin-service";
+import Spinner from "react-spinner-material";
+import moment from "moment";
+import {
+  ToastsContainer,
+  ToastsStore,
+  ToastsContainerPosition
+} from "react-toasts";
 
 class ManageDiscountComponent extends Component {
   constructor(props) {
@@ -16,7 +26,13 @@ class ManageDiscountComponent extends Component {
       productFounds: [],
       searchText: "",
       productSelected: [],
-      inputSearchLostFocus: false
+      inputSearchLostFocus: false,
+      showSuccessMessage: false,
+      addSuccess: false,
+      processing: false,
+      newDiscountStartDate: "",
+      newDiscountDueDate: "",
+      discountValue: ""
     };
   }
 
@@ -96,7 +112,10 @@ class ManageDiscountComponent extends Component {
   _renderProductsSelected() {
     let products = this.state.productSelected.map((product, index) => (
       <div key={index} className="text-left search-product-item no-padding">
-        <span className="cut-text cut-text-width-300px"> &nbsp; {product._id} </span>
+        <span className="cut-text cut-text-width-300px">
+          {" "}
+          &nbsp; {product._id}{" "}
+        </span>
         <span className="cut-text cut-text-width-300px">{product.name} </span>
         <span className="cut-text ">{product.price} </span>
         <span className="cut-text ">{product.quantity} </span>
@@ -120,7 +139,7 @@ class ManageDiscountComponent extends Component {
         className="text-left search-product-item"
         onClick={this._addProduct.bind(this, product)}
       >
-        <span >{product._id} &nbsp;&nbsp;</span>
+        <span>{product._id} &nbsp;&nbsp;</span>
         <span className="cut-text">{product.name} </span>
         <span className="add-item">+</span>
       </div>
@@ -154,9 +173,58 @@ class ManageDiscountComponent extends Component {
     return productFounds;
   }
 
+  _addNewDiscount() {
+    let startDate = moment(this.state.newDiscountStartDate).format("X");
+    let dueDate = moment(this.state.newDiscountDueDate).format("X");
+    let productIds = this.state.productSelected.map(product => product._id);
+    let newDiscount = {
+      startDate: startDate,
+      endDate: dueDate,
+      products: productIds,
+      value: this.state.discountValue
+    };
+    console.log(newDiscount);
+    this.setState({ processing: true, showSuccessMessage: false }, () => {
+      addNewDiscountWithPermision(newDiscount)
+        .then(resAddDiscount => {
+          if (
+            resAddDiscount &&
+            resAddDiscount.data &&
+            resAddDiscount.data.ok === 1
+          ) {
+            this.setState(
+              {
+                addSuccess: true,
+                showSuccessMessage: true,
+                processing: false
+              },
+              () => {
+                ToastsStore.success("Thêm Ma giảm giá thành công");
+              }
+            );
+          } else {
+            ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+          }
+        })
+        .catch(errData => {
+          this.setState({
+            processing: false,
+            addSuccess: false,
+            showSuccessMessage: false
+          });
+          ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+          console.log(errData);
+        });
+    });
+  }
+
   render() {
     return (
       <div className="Discount-component">
+        <ToastsContainer
+          store={ToastsStore}
+          position={ToastsContainerPosition.TOP_RIGHT}
+        />
         <div className="container-discount">
           <p className="title-tab">ManageDiscountComponent</p>
           <Row>
@@ -167,7 +235,7 @@ class ManageDiscountComponent extends Component {
                   className="input-date-style"
                   type="date"
                   onChange={e => {
-                    this.setState({ newtaskDueDate: e.target.value });
+                    this.setState({ newDiscountStartDate: e.target.value });
                   }}
                 />
                 <p className="sub-title">Ngày kết thúc</p>
@@ -175,7 +243,7 @@ class ManageDiscountComponent extends Component {
                   className="input-date-style"
                   type="date"
                   onChange={e => {
-                    this.setState({ newtaskDueDate: e.target.value });
+                    this.setState({ newDiscountDueDate: e.target.value });
                   }}
                 />
                 <p className="sub-title">Sản phẩm áp dụng</p>
@@ -207,24 +275,82 @@ class ManageDiscountComponent extends Component {
                   className="input-date-style"
                   type="text"
                   onChange={e => {
-                    this.setState({ newtaskDueDate: e.target.value });
+                    this.setState({ discountValue: e.target.value });
                   }}
                 />
-                <Button
-                  className="button-add"
-                  // onClick={this._openEdit.bind(this )}
-                >
-                  Thêm
-                </Button>
+
+                <div className="parent">
+                  {/* processing */}
+                  <div
+                    className={
+                      "Processing " +
+                      (this.state.processing === true
+                        ? "block"
+                        : "display-none")
+                    }
+                  >
+                    <Spinner
+                      size={20}
+                      spinnerColor={"#3d9191"}
+                      spinnerWidth={4}
+                      visible={true}
+                    />
+                    <span>Processing ...</span>
+                  </div>
+
+                  {/* responseMessage */}
+                  <div
+                    className={
+                      "Processing " +
+                      (this.state.processing === false &&
+                      this.state.showSuccessMessage === true
+                        ? "block"
+                        : "display-none") +
+                      (this.state.addSuccess === true ? " SUCCESS" : " FAIL")
+                    }
+                  >
+                    <i
+                      className={
+                        this.state.addSuccess === true
+                          ? "far fa-check-circle"
+                          : "far fa-times-circle"
+                      }
+                    />
+                    <span>
+                      {" "}
+                      {this.state.addSuccess === true
+                        ? "Thành công"
+                        : "Thất bại"}{" "}
+                    </span>
+                  </div>
+
+                  <button
+                    className={
+                      this.state.editCategory === true ? "d-none" : "button-add"
+                    }
+                    disabled={this.setState.processing}
+                    onClick={this._addNewDiscount.bind(this)}
+                  >
+                    {this.state.processing === true
+                      ? "Đang thêm ..."
+                      : "Thêm mới"}
+                  </button>
+                </div>
               </div>
             </Col>
             <Col xs={12} sm={7} md={7} lg={8} className="col-padding-top">
               <p className="sub-title">Danh sách sản phẩm áp dụng</p>
-              <p>
-                <span className="cut-text cut-text-width-300px border-cut-text"> ID</span>
-                <span className="cut-text cut-text-width-300px border-cut-text"> NAME </span>
+              <p className="border-title">
+                <span className="cut-text cut-text-width-300px border-cut-text">
+                  {" "}
+                  ID
+                </span>
+                <span className="cut-text cut-text-width-300px border-cut-text">
+                  {" "}
+                  NAME{" "}
+                </span>
                 <span className="cut-text border-cut-text"> PRICE </span>
-                <span className="cut-text border-cut-text">QUANTITY </span>
+                <span className="cut-text border-cut-text"> QUANTITY </span>
                 <span className="cut-text border-cut-text"> SALE </span>
                 <span className="cut-text border-cut-text">SHOW </span>
               </p>

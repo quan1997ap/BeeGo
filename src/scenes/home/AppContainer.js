@@ -35,12 +35,15 @@ import ManageDiscountComponent from "../../components/private_router/Admin/Manag
 import ManagePaymentComponent from "../../components/private_router/Admin/ManagePaymentComponent/ManagePaymentComponent";
 import ManageUserComponent from "../../components/private_router/Admin/ManageUserComponent/ManageUserComponent";
 import NotificationPermissionComponent from "../../components/public_router/NotificationPermissionComponent/NotificationPermissionComponent";
+
 // provider
 import ManageProductComponent from "../../components/private_router/Provider/ManageProduct/ManageProduct";
-
+import CategorisComponent from "../../components/private_router/Provider/CategorisComponent/CategorisComponent";
+import ManageOrderComponent from "../../components/private_router/Provider/ManageOrderComponent/ManageOrderComponent";
 
 //customer
 import ProfileComponent from "../../components/public_router/ProfileComponent/ProfileComponent";
+
 
 // Create store
 const store = createStore(rootReducer);
@@ -131,7 +134,9 @@ class AppContainer extends Component {
                 {/* Provider */}
                 <PrivateRoute  path="/provider/manage/" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "provider" component={ManageProductComponent} />
                 <PrivateRoute  path="/provider/manage/product" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "provider" component={ManageProductComponent} />
-                
+                <PrivateRoute  path="/provider/manage/category" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "provider" component={CategorisComponent} />
+                <PrivateRoute  path="/provider/manage/order" exact authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter = "provider" component={ManageOrderComponent} />
+
                 {/* Customer */}
                 <PrivateRoute path="/customer/list-product-of-user"  exact  authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter="customer" component={Cart} />        
                   <PrivateRoute path="/customer/profile"  exact  authed={store.getState().authenticationInfo.isLogin} currentRole={store.getState().authenticationInfo.role} roleRouter="customer" component={ProfileComponent} />                            

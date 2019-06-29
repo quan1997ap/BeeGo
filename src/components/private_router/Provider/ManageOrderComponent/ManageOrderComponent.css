@@ -1,0 +1,12 @@
+.container{
+  padding: 30px 20px;
+}
+.border-table{
+  border: 1px solid;
+  margin: 20px 0;
+}
+.td-title{
+  height: 50px;
+  line-height: 50px;
+  padding: 10px 10px;
+}

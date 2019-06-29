@@ -1,6 +1,6 @@
 export class UseInfoModel{
-  constructor(username, password, email, typeuser ) {
-    this.username = username;
+  constructor(name, password, email, typeuser ) {
+    this.name = name;
     this.password = password;
     this.email = email;
     this.type = typeuser;

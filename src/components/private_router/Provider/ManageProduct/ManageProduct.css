@@ -176,6 +176,7 @@
   border: 1px solid #aaaaaa;
   height: 35px;
   padding: 0 10px;
+  width: 100%;
 }
 
 .input-style-currence::placeholder {
@@ -382,6 +383,11 @@
   margin: 0 0 15px;
   position: relative;
 }
+.crop-thumnail-img{
+  width: 50% !important;
+  padding-bottom: 50% !important;
+  margin-top: 10px;
+}
 .crop img {
   width: 100%;
   max-height: none;
@@ -396,8 +402,28 @@
 }
 
 .choose-img{
-  width: 40px;
+  width: 30px;
   margin-left: 10px;
-  height: 40px;
+  height: 30px;
   cursor: pointer;
+  border-radius: 50%;
+}
+.btn-upload-img{
+  margin-top: 10px;
+  float: right;
+  height: 40px;
+  border-radius: 10px;
+}
+
+#uploading {
+  -webkit-animation: rotation 2s infinite linear;
+}
+
+@-webkit-keyframes rotation {
+  from {
+      -webkit-transform: rotate(0deg);
+  }
+  to {
+      -webkit-transform: rotate(359deg);
+  }
 }

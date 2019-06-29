@@ -26,7 +26,9 @@
   text-align: left;
   font-size: 16px;
   padding-left: 15px;
-  padding-top: 20px;
+  padding-top: 15px;
+  background: #f5f5f5;
+  padding-bottom: 15px;
 }
 
 /* custom slider arrow */

@@ -104,6 +104,15 @@ export function getProductsForDiscount(){
   });
 } 
 
+// discount
+
+export function addNewDiscountWithPermision(newDiscount){
+  return http.post(`${rootPath}/api/admin/discount/add`,newDiscount ,{
+    cancelToken: new CancelToken(function executor(c) {
+      cancel = c;
+    })
+  });
+} 
 
 
 // payment 

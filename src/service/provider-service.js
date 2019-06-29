@@ -5,7 +5,7 @@ import axios from 'axios';
 const CancelToken = axios.CancelToken;
 let cancel;
 
-// manage Product
+
 
 // manage Category
 export function getALLCategoryForProvider(){
@@ -15,6 +15,8 @@ export function getALLCategoryForProvider(){
     })
   });
 } 
+
+// manage Product
 
 export function getAllProductOfProvider(){
   return http.get(`${rootPath}/api/provider/product/list`,{
@@ -32,10 +34,21 @@ export function addNewProduct(newProduct){
   });
 } 
 
+export function addImgToProduct(productId, subOwner, filenames, tags, isPublic){
+  let data = { owner : productId, subOwner, filename : filenames, tags, isPublic };
+  return http.post(`${rootPath}/api/upload/update-multiple`,data ,{
+    cancelToken: new CancelToken(function executor(c) {
+      cancel = c;
+    })
+  });
+
+} 
+
+
 export function editProduct(productId,productEdited, actionName){
   console.log(productId)
   if (actionName === "edit"){
-    return http.post(`${rootPath}/api//provider/product/edit/${productId}`,productEdited ,{
+    return http.post(`${rootPath}/api/provider/product/edit/${productId}`,productEdited ,{
       cancelToken: new CancelToken(function executor(c) {
         cancel = c;
       })
@@ -43,13 +56,32 @@ export function editProduct(productId,productEdited, actionName){
   }
   else if (actionName === "delete"){
     productEdited.isShow = false;
-    return http.post(`${rootPath}/api//provider/product/edit/${productId}`,productEdited ,{
+    return http.post(`${rootPath}/api/provider/product/edit/${productId}`,productEdited ,{
       cancelToken: new CancelToken(function executor(c) {
         cancel = c;
       })
     });
   }
 } 
+
+// manage order
+export function getAllOrder(){
+  return http.get(`${rootPath}/api/provider/order/list`);
+} 
+
+export function acceptOrder(orderId){
+  return http.post(`${rootPath}/api/provider/order/nhan-don/${orderId}`);
+} 
+
+export function deliveryOrder(orderId){
+  return http.post(`${rootPath}/api/provider/order/nhan-don/${orderId}`,{
+    cancelToken: new CancelToken(function executor(c) {
+      cancel = c;
+    })
+  });
+} 
+
+
 
 // cancel Request
 export default function cancelRequest() {

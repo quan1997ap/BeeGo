@@ -1,9 +1,6 @@
 import React, { Component } from "react";
 import "./ManageProduct.css";
 import { Row, Col, Button, Table, Modal, Dialog } from "react-bootstrap";
-import cancelRequest, {
-  getListCategoryWithPermision,
-} from "../../../../service/admin-service";
 import Spinner from "react-spinner-material";
 import {
   ToastsContainer,
@@ -11,15 +8,19 @@ import {
   ToastsContainerPosition
 } from "react-toasts";
 import { ProductInfoModel } from "../../../../model/productinfo.model";
-import axios from "axios";
 import ReadMoreReact from "read-more-react";
 import {
   addNewProduct,
   getAllProductOfProvider,
   editProduct,
-  getALLCategoryForProvider
+  getALLCategoryForProvider,
+  addImgToProduct
 } from "../../../../service/provider-service";
 import { _validateNumber } from "../../../../configs/validates";
+import { _formatCurrency } from "../../../../configs/format";
+import axios, { post } from "axios";
+import { rootPath } from "../../../../configs/enviroment";
+// https://gist.github.com/AshikNesin/e44b1950f6a24cfcd85330ffc1713513
 
 class ManageProductComponent extends Component {
   constructor(props) {
@@ -32,7 +33,7 @@ class ManageProductComponent extends Component {
       processing: false,
       addSuccess: false,
       showSuccessMessage: false,
-      productIdEdit: "", 
+      productIdEdit: "",
 
       // add new
       listProduct: [],
@@ -44,7 +45,8 @@ class ManageProductComponent extends Component {
       discountNumber: "",
       maxProductOrder: "",
       quantityProduct: "",
-      imageProduct: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-dXChVjiSLKFgsv9Yz-tztMMIlwKCPFsU8EcMX-KWAIjAoDyy",
+      imageProduct:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-dXChVjiSLKFgsv9Yz-tztMMIlwKCPFsU8EcMX-KWAIjAoDyy",
 
       // edit
       isEditProduct: false,
@@ -60,8 +62,17 @@ class ManageProductComponent extends Component {
       inputPriceLostFocus: false,
       inputMaxOrderLostFocus: false,
       inputQuantityOrderLostFocus: false,
-      inputDiscountOrderLostFocus: false
+      inputDiscountOrderLostFocus: false,
+
+      // add img
+      files: null,
+      imgFilesUpLoadedID: [],
+      imgFilesUpLoadedName: [],
+      uploading: false
     };
+    // this.onFormSubmit = this.onFormSubmit.bind(this);
+    this._chooseImg = this._chooseImg.bind(this);
+    this._uploadImg = this._uploadImg.bind(this);
   }
 
   componentDidMount() {
@@ -71,8 +82,60 @@ class ManageProductComponent extends Component {
 
   _getListProductForCustomer() {
     getAllProductOfProvider().then(resListProduct => {
+      // console.log(resListProduct);
       this.setState({ listProduct: resListProduct.data });
     });
+  }
+
+  _renderImgsUploaded() {
+    let imgs = this.state.imgFilesUpLoadedName.map((imgName, index) => (
+      <div className="crop crop-thumnail-img" key={index}>
+        <img src={"http://food.negoo.tech/api/file?filename=" + imgName + "&size=30x30"} />
+      </div>
+    ));
+    return imgs;
+  }
+
+  _chooseImg(e) {
+    let f = [];
+    for (let i = 0; i < e.target.files.length; i++) {
+      f.push(e.target.files[i]);
+    }
+    this.setState({ files: f }, () => {
+      console.log(this.state.files);
+    });
+  }
+
+  fileUpload(files) {
+    const url = `${rootPath}/api/upload/files`;
+    let formData = new FormData();
+    for (let file of files) {
+      formData.append("files", file, file.name);
+    }
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data"
+      }
+    };
+    return post(url, formData, config);
+  }
+
+  _uploadImg(e) {
+    e.preventDefault(); // Stop form submit
+    this.setState({uploading: true}, () =>{
+      this.fileUpload(this.state.files).then(response => {
+        if (response.data) {
+          let imgIds = response.data.map((img, index) => img._id);
+          let imgNames = response.data.map((img, index) => img.filename);
+          this.setState(
+            { imgFilesUpLoadedID: imgIds, imgFilesUpLoadedName: imgNames },
+            () => {
+              this.setState({uploading: false})
+            }
+          );
+        }
+      });
+    })
   }
 
   _interpolationListCategory(arrAll, arrRoot, k) {
@@ -114,23 +177,27 @@ class ManageProductComponent extends Component {
 
   _getListCategoryWithPermision() {
     getALLCategoryForProvider()
-    .then(arrListCategory => {
-      console.log(arrListCategory)
-      if (arrListCategory && arrListCategory.data.length > 0 ){
-        let listSourceCategory = Object.assign([], arrListCategory.data );
-        let listRootCategory = listSourceCategory.filter(category => category.parentId == null);
-        this.setState({
-          listSourceCategory: listSourceCategory,
-          listRootCategory: listRootCategory
-        }, () =>{
-          let convertDataListCategory = this._interpolationListCategory(
-            listSourceCategory,
-            listRootCategory,
-            0
+      .then(arrListCategory => {
+        if (arrListCategory && arrListCategory.data.length > 0) {
+          let listSourceCategory = Object.assign([], arrListCategory.data);
+          let listRootCategory = listSourceCategory.filter(
+            category => category.parentId == null
           );
-          this.setState({ listCategory: convertDataListCategory });
-        });
-      }
+          this.setState(
+            {
+              listSourceCategory: listSourceCategory,
+              listRootCategory: listRootCategory
+            },
+            () => {
+              let convertDataListCategory = this._interpolationListCategory(
+                listSourceCategory,
+                listRootCategory,
+                0
+              );
+              this.setState({ listCategory: convertDataListCategory });
+            }
+          );
+        }
       })
       .catch(e => this.setState({ errGetCategory: e }));
   }
@@ -211,22 +278,25 @@ class ManageProductComponent extends Component {
 
   _renderListProduct(listProduct) {
     let listProductDetail;
+    // console.log(listProduct)
     listProductDetail = listProduct.map((product, index) => {
-      if (product.isShow === true) {
+      if (product.isShow === true ){
         return (
           // chèn thêm 1 dấu cách vào trước option
           <tr key={"level-" + product._id}>
-            <td style = {{minWidth : 100}}>
-              <div className ="crop">
-                 <img src = {require("../../../../assets/image/product.jpg")} />
+            <td style={{ minWidth: 100 }}>
+              <div className="crop">
+                <img src={ product.images && product.images[0] ? ("http://food.negoo.tech/api/file?filename=" + product.images[0]) : require("../../../../assets/image/product.jpg") }  />
               </div>
             </td>
             <td>{product.name} </td>
-            <td>{product.description} </td>
-            <td>{product.price}</td>
-            <td>{product.quantity}</td>
-            <td>{product.maxOrder}</td>
+            {/* <td>{product.description} </td> */}
+            <td>{product._id} </td>
+            <td>{_formatCurrency(product.price)}</td>
+            <td>{_formatCurrency(product.quantity)}</td>
+            <td>{_formatCurrency(product.maxOrder)}</td>
             <td>{product.sale}</td>
+            <td>{product.isShow.toString()}</td>
             <td>
               <Button
                 className="edit-button"
@@ -266,12 +336,12 @@ class ManageProductComponent extends Component {
     this.setState({ processing: true, showSuccessMessage: false }, () => {
       let newProduct = new ProductInfoModel(
         this.state.productName,
-        [this.state.imageProduct],
+        this.state.imgFilesUpLoadedID,
         this.state.productPrice,
         this.state.productDescription,
         this.state.maxProductOrder,
         this.state.quantityProduct,
-        this.state.categoryID === "" ? null : this.state.categoryID , 
+        this.state.categoryID === "" ? null : this.state.categoryID,
         true,
         this.state.isDiscountProduct,
         this.state.discountNumber
@@ -279,27 +349,35 @@ class ManageProductComponent extends Component {
       console.log(newProduct);
       addNewProduct(newProduct)
         .then(resNewsProduct => {
-          console.log(resNewsProduct);
           if (resNewsProduct.data.message === "Add Product success") {
-            this.setState(
-              {
-                productName: "",
-                productPrice: "",
-                productDescription: "",
-                maxProductOrder: "",
-                quantityProduct: "",
-                addSuccess: true,
-                showSuccessMessage: true,
-                processing: false
-              },
-              () => {
-                let listProduct = this.state.listProduct;
-                let newListProduct = listProduct.concat([
-                  resNewsProduct.data.data
-                ]);
-                this.setState({ listProduct: newListProduct });
-                ToastsStore.success("Thêm sản phẩm thành công");
-              }
+            let productId = resNewsProduct.data.data._id;
+            addImgToProduct(
+              productId,
+              [productId],
+              this.state.imgFilesUpLoadedName,
+              [],
+              true
+            ).then(
+              this.setState(
+                {
+                  productName: "",
+                  productPrice: "0",
+                  productDescription: "",
+                  maxProductOrder: "0",
+                  quantityProduct: "0",
+                  addSuccess: true,
+                  showSuccessMessage: true,
+                  processing: false
+                },
+                () => {
+                  let listProduct = this.state.listProduct;
+                  let newListProduct = listProduct.concat([
+                    resNewsProduct.data.data
+                  ]);
+                  this.setState({ listProduct: newListProduct });
+                  ToastsStore.success("Thêm sản phẩm thành công");
+                }
+              )
             );
           }
         })
@@ -334,7 +412,6 @@ class ManageProductComponent extends Component {
   }
 
   _openEditProduct(oldProduct) {
-
     this.setState({
       isEditProduct: true,
       productName: oldProduct.name,
@@ -348,7 +425,7 @@ class ManageProductComponent extends Component {
       showSuccessMessage: false,
       processing: false,
       oldProduct: oldProduct,
-      productIdEdit : oldProduct._id
+      productIdEdit: oldProduct._id
     });
   }
 
@@ -379,10 +456,10 @@ class ManageProductComponent extends Component {
                 listProduct: listProduct,
                 isEditProduct: false,
                 productName: "",
-                productPrice: "",
+                productPrice: "0",
                 productDescription: "",
-                quantityProduct: "",
-                maxProductOrder: "",
+                quantityProduct: "0",
+                maxProductOrder: "0",
                 categoryID: "",
                 processing: false
               },
@@ -391,12 +468,16 @@ class ManageProductComponent extends Component {
               }
             );
           } else {
-            this.setState( { processing: false}, () => {  ToastsStore.error("Có lỗi xảy ra, hãy thử lại !"); });
+            this.setState({ processing: false }, () => {
+              ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+            });
           }
         })
         .catch(err => {
           console.log(err);
-          this.setState( { processing: false}, () => {  ToastsStore.error("Có lỗi xảy ra, hãy thử lại !"); });
+          this.setState({ processing: false }, () => {
+            ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+          });
         });
     });
   }
@@ -448,7 +529,9 @@ class ManageProductComponent extends Component {
           store={ToastsStore}
           position={ToastsContainerPosition.TOP_RIGHT}
         />
-
+        {/* <div className="container-login100 Profile">
+          adsđá
+        </div> */}
         <div className="container-login100 Profile">
           <Row className="d-flex">
             <Col
@@ -620,19 +703,24 @@ class ManageProductComponent extends Component {
                   Bạn phải nhập đúng định dạng só
                 </div>
 
-
                 <p className="sub-title"> Chọn ảnh</p>
                 <div>
                   <input
                     className="input-style"
-                    type="text"
-                    value={this.state.imageProduct}
-                    onChange={imgProduct => {
-                      this.setState({ imageProduct: imgProduct.target.value });
-                    }}
-                    name="category-name"
+                    type="file"
+                    multiple="multiple"
+                    onChange={this._chooseImg}
                   />
-                  <img src={require("../../../../assets/image/icon/select-img.jpg")} alt="Chọn ảnh" className = "choose-img"/>
+                  <Button onClick={this._uploadImg} className="btn-upload-img">
+                    Upload
+                    <img
+                      src={require("../../../../assets/image/icon/select-img.jpg")}
+                      alt="Chọn ảnh"
+                      className="choose-img"
+                      id={this.state.uploading === true ? "uploading" : ""}
+                    />
+                  </Button>
+                  <div>{this._renderImgsUploaded()}</div>
                 </div>
 
                 <p className="sub-title"> Category cha</p>
@@ -670,7 +758,14 @@ class ManageProductComponent extends Component {
                     }
                   />
                   <span>Có giảm giá</span>
-                  <div className= { "discount " + (this.state.isDiscountProduct == true ? "": "display-none")}>
+                  <div
+                    className={
+                      "discount " +
+                      (this.state.isDiscountProduct == true
+                        ? ""
+                        : "display-none")
+                    }
+                  >
                     <input
                       className="input-style input-discount"
                       type="text"
@@ -758,14 +853,14 @@ class ManageProductComponent extends Component {
                     }
                     disabled={
                       this.state.processing === true ||
-                      this.state.productName === "" || 
-                      this.state.productPrice === "" || 
-                      this.state.productDescription === "" || 
-                      this.state.maxProductOrder === "" || 
-                      this.state.quantityProduct === "" || 
-                      this.state.isDiscountProduct === "" || 
+                      this.state.productName === "" ||
+                      this.state.productPrice === "" ||
+                      this.state.productDescription === "" ||
+                      this.state.maxProductOrder === "" ||
+                      this.state.quantityProduct === "" ||
+                      this.state.isDiscountProduct === "" ||
                       // this.state.discountNumber === ""  ||
-                      _validateNumber(this.state.discountNumber) === false ||
+                      // _validateNumber(this.state.discountNumber) === false ||
                       _validateNumber(this.state.maxProductOrder) === false ||
                       _validateNumber(this.state.productPrice) === false ||
                       _validateNumber(this.state.quantityProduct) === false
@@ -813,6 +908,7 @@ class ManageProductComponent extends Component {
                       <th>Số SP đang bán</th>
                       <th>Số SP / 1 lần mua</th>
                       <th>Sale (%)</th>
+                      <th>Show</th>
                       <th>Chỉnh sửa</th>
                     </tr>
                   </thead>

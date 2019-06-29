@@ -16,7 +16,7 @@ export function getAllCategoryHomePage(){
 } 
 
 export function getProductByCategoryId(categoryID){
-  return http.get(`${rootPath}/api/product/list?sort=&category=${categoryID}`,{
+  return http.get(`${rootPath}/api/product/list?category=${categoryID}`,{
     cancelToken: new CancelToken(function executor(c) {
       cancel = c;
     })
@@ -29,4 +29,22 @@ export function getCart(){
       cancel = c;
     })
   });
+} 
+
+export function getAllOrderForCustomer(){
+  return http.get(`${rootPath}/api/customer/order/list`);
+} 
+
+// xác nhận đã nhận hàng
+
+export function orderSuccess(orderInfo){
+  return http.put(`${rootPath}/api/customer/order/success`, orderInfo,{
+    cancelToken: new CancelToken(function executor(c) {
+      cancel = c;
+    })
+  });
+}
+
+export function getCustomerInfo(){
+  return http.get(`${rootPath}/api/token/info`);
 } 

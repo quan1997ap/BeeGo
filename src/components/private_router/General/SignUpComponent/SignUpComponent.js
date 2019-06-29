@@ -29,17 +29,19 @@ class SignUpComponent extends Component {
       emailInputLostFocus: false,
 
       resMessage: "",
-      componentDidMount: false
+      componentDidMount: false,
+      loading: false,
     };
-    // this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount(){
+    window.scrollTo(0, 0);
     // fix err when brower auto save username and password 
     setTimeout( () => {
       this.setState( {componentDidMount : true});
     }, 1000);
   }
+
   _selectTypeUser(typeUser) {
     this.setState({
       typeuser: typeUser,
@@ -50,23 +52,21 @@ class SignUpComponent extends Component {
 
 
   _registerUserInfo(name, pass, email, type) {
+    this.setState({loading: true});
     let userInfo = new UseInfoModel();
-    userInfo.username = name;
+    userInfo.name = name;
     userInfo.password = pass;
     userInfo.email = email;
     userInfo.type = type;
     signUpService(userInfo).then(resRegister => {
-      console.log(resRegister);
-      if (resRegister != undefined && resRegister.data.resut == false){
+      if (resRegister !== undefined && resRegister.data.resut === false){
         ToastsStore.error(resRegister.data.message);
         this.setState({resMessage : resRegister.data.message }) ;
-        // this.props.history.push({
-        //   pathname: "/login",
-        //   statusRegister : "success"
-        // });
+        this.setState({loading: false});
       }
-      else if(resRegister != undefined && resRegister.data.resut == true){
+      else if(resRegister !== undefined && resRegister.data.success === true){
         ToastsStore.success("Đăng kí thành công !");
+        this.setState({loading: false});
         this.props.history.push({
           pathname: "/login",
           statusRegister : "success"
@@ -75,6 +75,8 @@ class SignUpComponent extends Component {
     }).catch(
       e=> {
         ToastsStore.error("Có lỗi xảy ra, hãy thử lại !");
+        ToastsStore.success("Đăng kí thất bại !");
+        this.setState({loading: false});
       }
     );
   }
@@ -225,11 +227,11 @@ class SignUpComponent extends Component {
                     )}
                     className={
                       "login100-form-btn " +
-                      (this.state.username === "" || this.state.password === "" || this.state.email === "" || _validateEmail(this.state.email) === false ? "Opacity-disable" : "btn-type-user-form-valid")
+                      (this.state.loading === true || this.state.username === "" || this.state.password === "" || this.state.email === "" || _validateEmail(this.state.email) === false ? "Opacity-disable" : "btn-type-user-form-valid")
                     }
-                    disabled={ (this.state.username === "" || this.state.password === "" || this.state.email === "" || _validateEmail(this.state.email)  === false ) ? true : false}
+                    disabled={ (this.state.loading === true || this.state.username === "" || this.state.password === "" || this.state.email === "" || _validateEmail(this.state.email)  === false ) ? true : false}
                   >
-                    Đăng kí
+                    {this.state.loading === true ? "Đang đăng kí" : "Đăng kí"}
                   </Button>
                   <span className="focus-input100" />
                 </div>

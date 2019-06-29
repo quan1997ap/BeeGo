@@ -29,7 +29,7 @@ class ProfileComponent extends Component {
     return (
       <div className="container-custom search-component">
           <div className="user-card">
-              <p className = "cart-name">THÔNG TIN CÁ NHÂN</p>
+              <p className = "cart-name">THÔNG TIN CÁ NHÂN</p><br/>
 
               <p className= "info-detail">
                 <span className="title">Name:</span>

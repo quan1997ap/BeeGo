@@ -27,6 +27,6 @@ export function getPayments() {
     return http.get(`${rootPath}/api/customer/payment/list`);
 }
 
-export function payBill(items) {
-    return http.get(baseUrl);
+export function payBill(payload) {
+    return http.post(`${rootPath}/api/customer/order/add`, payload)
 }

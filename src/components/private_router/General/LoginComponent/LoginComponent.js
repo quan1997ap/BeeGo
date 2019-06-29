@@ -64,6 +64,7 @@ class LoginComponent extends Component {
   }
 
   componentWillMount(){
+    window.scrollTo(0, 0);
     if(this.props.location.statusRegister != undefined && this.props.location.statusRegister === "success" ){
       this.setState({registerSuccess : true})
     }

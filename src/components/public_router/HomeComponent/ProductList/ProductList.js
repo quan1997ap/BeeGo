@@ -10,6 +10,7 @@ import {
   ToastsStore,
   ToastsContainerPosition
 } from "react-toasts";
+import { _formatCurrency } from "../../../../configs/format";
 
 class _ProductList extends React.Component {
   constructor(props) {
@@ -21,11 +22,10 @@ class _ProductList extends React.Component {
   }
 
   componentDidMount() {
-    // console.log('vao', this.props.categoryID);
     getProductByCategoryId(this.props.categoryID).then(resProducts => {
       if (resProducts.data.length > 0) {
         this.setState({ productList: resProducts.data, categoryName: resProducts.data[0].category }, () => {
-          console.log(this.state.productList);
+          // console.log(this.state.productList);
         });
       }
     });
@@ -43,10 +43,8 @@ class _ProductList extends React.Component {
     let data = {
       products: [id]
     };
-    console.log(data)
     addItemsToCart(data)
       .then(data => {
-        console.log(data)
         this.props.history.push({
           pathname: 'customer/list-product-of-user',
           search: "?" + new URLSearchParams({ search: this.state.searchText }).toString(),
@@ -63,14 +61,14 @@ class _ProductList extends React.Component {
         <div className="cartProductCover">
           <div className="cartProduct">
             <div className="crop">
-              <img src={require("../../../../assets/image/product.jpg")} />
+              <img src={ product.images && product.images[0] ? ("http://food.negoo.tech/api/file?filename=" + product.images[0]) : require("../../../../assets/image/product.jpg") }  />
             </div>
             <p className="name-product">
               {this._sliceText(this.state.productList[index].name, 56)}
             </p>
 
             <div>
-              <span className="cost"> Giá: {this.state.productList[index].price}đ</span>
+              <span className="cost"> Giá: {_formatCurrency(this.state.productList[index].price)}đ</span>
               <span className="sell-number"> {this.state.productList[index].ordered} đã bán</span>
             </div>
           </div>
@@ -91,7 +89,7 @@ class _ProductList extends React.Component {
           store={ToastsStore}
           position={ToastsContainerPosition.TOP_RIGHT}
         />
-        <p className="title-slider-category">{this.state.categoryName}</p>
+        <hr/><p className="title-slider-category">{this.props.categoryName} </p><hr/>
         <Row className="no-margin" >
           {this.renderListProduct()}
         </Row>

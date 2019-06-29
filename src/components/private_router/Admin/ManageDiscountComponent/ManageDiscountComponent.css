@@ -92,6 +92,9 @@
     border-right: 1px solid #ea4343;
     border-left: 1px solid #ea4242;
 }
+.border-title{
+    border-bottom: 1px solid #ea4242;
+}
 .cut-text-width-150px{
     width: 150px;
 }

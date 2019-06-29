@@ -16,12 +16,14 @@ export class HomeComponent extends React.Component {
   }
 
   componentDidMount(){
+    window.scrollTo(0, 0);
     getAllCategoryHomePage().then(categoris => {
+      console.log(categoris);
       this.setState({ listCategory: categoris.data }, () => {
          let listCategoryId = [];
          this.state.listCategory.forEach( (category, index) =>{
-           if (index < 5){
-            listCategoryId.push(category._id)
+           if (index < 10){
+            listCategoryId.push({_id: category._id, name : category.name })
            }
            this.setState({listCategoryId:listCategoryId});
          })
@@ -31,8 +33,8 @@ export class HomeComponent extends React.Component {
 
   renderListProduct(){
     let listCategoryId = Object.assign([], this.state.listCategoryId);
-    let productList = listCategoryId.map( (categoryID , index) => (
-      <ProductList key={index} categoryID = {categoryID}/>
+    let productList = listCategoryId.map( (category , index) => (
+      <ProductList key={index} categoryID = {category._id} categoryName = {category.name}/>
     ));
     return productList;
   }

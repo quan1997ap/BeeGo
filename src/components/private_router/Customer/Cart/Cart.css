@@ -1,14 +1,30 @@
-.user-card{
+.user-card {
     padding: 30px;
+    flex-direction: column;
 }
-.cart-name{
+
+.cart-item {
+    display: flex !important;
+    width: 100%;
+    justify-content: space-between;
     color: #dc3333;
+    font-weight: bold;
+    text-align: left;
+    font-size: 20px;
+    border: 1px solid rebeccapurple;
+    padding: 5px 15px;
+    border-radius: 10px;
+    margin: 10px 0
+}
+
+.cart-name {
+    color: #333;
     font-weight: bold;
     text-align: left;
     font-size: 20px;
 }
 
-.cart-item{
+.cart-item {
     display: inline-block;
     color: #dc3333;
     font-weight: bold;
@@ -16,16 +32,84 @@
     font-size: 20px;
 }
 
-.cart-price{
+.cart-price {
     color: #dc3333;
     font-weight: bold;
     text-align: left;
     font-size: 20px;
 }
 
-.cart-quantity{
+.cart-quantity {
     color: #dc3333;
     font-weight: bold;
     text-align: left;
     font-size: 20px;
+}
+
+.border-none {
+    border: none;
+}
+
+.boder-check-out-btn {
+    background: #dc3333;
+    height: 50px;
+    padding: 10px 10px;
+    color: #fff;
+    border-radius: 10px;
+}
+
+.item-name, .item-price, .item-quantity {
+    padding-top: 13px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 150px;
+    white-space: nowrap;
+}
+
+.item-quantity > span{
+    width: 50px;
+    text-align: center;
+    display: inline-block;
+}
+
+.width-100px{
+    width: 100px;
+    text-align: center;
+}
+.width-200px{
+    width: 200px;
+}
+.delete-btn {
+    background: #dc3333;
+    height: 50px;
+    padding: 10px 10px;
+    color: #fff;
+    border-radius: 50%;
+}
+
+.add-btn, .sub-btn {
+    border: 1px solid;
+    width: 30px;
+    height: 30px;
+    margin: 0 10px;
+    line-height: 30px;
+    padding: 0 0;
+    font-weight: bold;
+    font-size: 15px;
+    border-radius: 5px;
+}
+
+.sum-cost {
+    color: #dc3333;
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: right !important;
+    padding: 0 40px;
+}
+
+.comment{
+    height: 40px;
+    width: 80%;
+    float: left;
 }

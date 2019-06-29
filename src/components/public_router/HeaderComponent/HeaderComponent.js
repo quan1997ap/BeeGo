@@ -102,8 +102,11 @@ class HeaderComponent extends Component {
         <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-left-menu Border-right-menu" >
             <Link to="/provider/manage/product"  style={{ color : this.state.currentPathName === "/provider/manage/product" ? "#fff" : "" }} className={"Child-Link1"} >Quản lý sản phẩm</Link>
         </Col>
+        <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-left-menu Border-right-menu" >
+            <Link to="/provider/manage/order"  style={{ color : this.state.currentPathName === "/provider/manage/order" ? "#fff" : "" }} className={"Child-Link1"} >Quản lý đơn hàng</Link>
+        </Col>
         <Col xs={12} sm={6} md={3} lg={2}  className="No-padding Border-right-menu" >
-            <Link to="/customer/manage/category"  style={{ color : this.state.currentPathName === "/provider/manage/category" ? "#fff" : "" }} className="Child-Link1">Quản lý danh mục</Link>
+            <Link to="/provider/manage/category"  style={{ color : this.state.currentPathName === "/provider/manage/category" ? "#fff" : "" }} className="Child-Link1">Các danh mục</Link>
         </Col>
     </Row>
      )

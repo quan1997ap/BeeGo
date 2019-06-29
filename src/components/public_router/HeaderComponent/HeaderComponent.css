@@ -310,7 +310,7 @@
     cursor: pointer;
 }
 .Account-info::before{
-    content: url(../../../assets//image/icon/account.png);
+    content: url(../../../assets/image/icon/account.png);
     background-repeat: no-repeat;
     position: absolute;
     top: 0;
